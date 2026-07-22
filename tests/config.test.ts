@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  DEFAULT_HOST,
-  normalizeHost,
-  resolveHost,
-  resolveToken,
-} from '../src/config.js';
+import { DEFAULT_HOST, normalizeHost, resolveHost, resolveToken } from '../src/config.js';
 
 describe('resolveToken', () => {
   it('prefers the flag over env vars', () => {

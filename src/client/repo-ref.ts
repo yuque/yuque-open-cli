@@ -5,8 +5,7 @@ import { UsageError } from '../errors.js';
  * or a `group/slug` namespace. Both map onto the same /repos/... URL shape.
  */
 export type RepoRef =
-  | { kind: 'id'; id: string }
-  | { kind: 'namespace'; group: string; slug: string };
+  { kind: 'id'; id: string } | { kind: 'namespace'; group: string; slug: string };
 
 export function parseRepoRef(input: string): RepoRef {
   const trimmed = input.trim();

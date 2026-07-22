@@ -22,6 +22,10 @@ export function buildProgram(): Command {
     .option('--host <host>', 'Yuque host, e.g. https://your-space.yuque.com (overrides YUQUE_HOST)')
     .option('--json', 'print the full API response as JSON')
     .showHelpAfterError('(run with --help for usage)');
+  // Must precede register* calls: commander copies the exit callback into each
+  // subcommand at .command() creation time, and the exit-code contract (usage
+  // errors -> 2) depends on subcommand errors throwing instead of process.exit.
+  program.exitOverride();
 
   registerAuthCommands(program);
   registerUserCommands(program);
@@ -37,7 +41,6 @@ export function buildProgram(): Command {
 /** Parse and run; returns the process exit code instead of exiting, for testability. */
 export async function runCli(argv: string[]): Promise<number> {
   const program = buildProgram();
-  program.exitOverride();
   try {
     await program.parseAsync(argv);
     return typeof process.exitCode === 'number' ? process.exitCode : 0;

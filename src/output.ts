@@ -47,16 +47,16 @@ function cell<T extends Record<string, unknown>>(row: T, column: Column<T>): str
   return String(value);
 }
 
-export function printTable<T extends Record<string, unknown>>(rows: T[], columns: Column<T>[]): void {
+export function printTable<T extends Record<string, unknown>>(
+  rows: T[],
+  columns: Column<T>[]
+): void {
   if (rows.length === 0) {
     process.stdout.write(dim('(no results)\n'));
     return;
   }
   const widths = columns.map((column) =>
-    Math.max(
-      displayWidth(column.header),
-      ...rows.map((row) => displayWidth(cell(row, column)))
-    )
+    Math.max(displayWidth(column.header), ...rows.map((row) => displayWidth(cell(row, column))))
   );
   const header = columns.map((column, i) => pad(column.header, widths[i])).join('  ');
   process.stdout.write(`${bold(header.trimEnd())}\n`);
