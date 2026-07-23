@@ -118,9 +118,10 @@ describe('doc reading', () => {
       body: {
         data: {
           id: 123,
+          type: 'Sheet',
           slug: 's',
           title: 'Sheet',
-          format: 'sheet',
+          format: 'lakesheet',
           body: '',
           body_sheet: '{"rows":[1]}',
         },
@@ -133,7 +134,7 @@ describe('doc reading', () => {
 
   it('doc get warns on stderr when no content field is renderable', async () => {
     server.route('GET', '/api/v2/repos/docs/124', {
-      body: { data: { id: 124, slug: 'b', title: 'Board', format: 'board' } },
+      body: { data: { id: 124, type: 'Board', slug: 'b', title: 'Board' } },
     });
     const result = await runYuque(['doc', 'get', '124'], { host });
     expect(result.code).toBe(0);
@@ -182,12 +183,12 @@ describe('toc & stats', () => {
 
   it('stats members --json preserves rows and total', async () => {
     server.route('GET', '/api/v2/groups/eng/statistics/members', {
-      body: { data: { members: [{ user_id: 1, read_count: 5 }], total: 1 } },
+      body: { data: { members: [{ user_id: '1', read_count: '5' }], total: 1 } },
     });
     const result = await runYuque(['stats', 'members', 'eng', '--json'], { host });
     expect(result.code).toBe(0);
     expect(JSON.parse(result.stdout)).toEqual({
-      members: [{ user_id: 1, read_count: 5 }],
+      members: [{ user_id: '1', read_count: '5' }],
       total: 1,
     });
   });
