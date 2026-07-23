@@ -28,7 +28,7 @@ yuque repo list my-team --group --all --json | jq '.[].name'
 **第二步：安装并登录：**
 
 ```bash
-npm install -g @yuque/cli
+npm install -g yuque-open-cli
 export YUQUE_TOKEN=YOUR_TOKEN
 yuque auth status
 ```
@@ -37,7 +37,7 @@ yuque auth status
 <summary><b>免安装运行（npx）</b></summary>
 
 ```bash
-YUQUE_TOKEN=YOUR_TOKEN npx @yuque/cli auth status
+YUQUE_TOKEN=YOUR_TOKEN npx yuque-open-cli auth status
 ```
 
 </details>
@@ -127,8 +127,8 @@ yuque doc list team/handbook --all --json | jq -r '.[].slug'
 ## 参与开发
 
 ```bash
-git clone https://github.com/yuque/cli.git
-cd cli
+git clone https://github.com/yuque/yuque-open-cli.git
+cd yuque-open-cli
 npm install
 npm test              # 单元测试
 npm run build         # 编译 TypeScript
@@ -149,10 +149,10 @@ npm run dev -- --help # 从源码运行
 [MIT](./LICENSE)
 
 [ci-image]: https://img.shields.io/github/actions/workflow/status/yuque/yuque-cli/ci.yml?style=flat-square&label=CI
-[ci-url]: https://github.com/yuque/cli/actions/workflows/ci.yml
-[npm-image]: https://img.shields.io/npm/v/%40yuque%2Fcli?style=flat-square
-[npm-url]: https://www.npmjs.com/package/@yuque/cli
-[download-image]: https://img.shields.io/npm/dm/%40yuque%2Fcli?style=flat-square
-[download-url]: https://www.npmjs.com/package/@yuque/cli
-[license-image]: https://img.shields.io/github/license/yuque/cli?style=flat-square
+[ci-url]: https://github.com/yuque/yuque-open-cli/actions/workflows/ci.yml
+[npm-image]: https://img.shields.io/npm/v/yuque-open-cli?style=flat-square
+[npm-url]: https://www.npmjs.com/package/yuque-open-cli
+[download-image]: https://img.shields.io/npm/dm/yuque-open-cli?style=flat-square
+[download-url]: https://www.npmjs.com/package/yuque-open-cli
+[license-image]: https://img.shields.io/github/license/yuque/yuque-open-cli?style=flat-square
 [license-url]: ./LICENSE

@@ -2,7 +2,7 @@
 
 ## 1.0.0
 
-Initial release of `@yuque/cli` — a spec-driven, scriptable command-line
+Initial release of `yuque-open-cli` — a spec-driven, scriptable command-line
 interface for Yuque:
 
 - 26 noun-verb commands covering all 38 operations of the Yuque OpenAPI —
