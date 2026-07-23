@@ -2,8 +2,8 @@
 
 ## 1.0.0
 
-Complete rewrite. Replaces the previous interactive REPL implementation
-(`yuque-cli@0.1.x`) with a spec-driven, scriptable CLI:
+Initial release of `@yuque/cli` — a spec-driven, scriptable command-line
+interface for Yuque:
 
 - 26 noun-verb commands covering all 38 operations of the Yuque OpenAPI —
   auth/ping, user, search, repos, docs (incl. version history), TOC, group
