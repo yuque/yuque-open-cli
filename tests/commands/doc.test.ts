@@ -61,7 +61,7 @@ describe('doc commands', () => {
       { id: 2, slug: 'guide', title: 'Guide', word_count: 300, updated_at: '2026-01-02' },
     ];
 
-    it('GETs {repoBase}/docs for a namespace and prints the full JSON with --json', async () => {
+    it('GETs {bookBase}/docs for a namespace and prints the full JSON with --json', async () => {
       request.mockResolvedValueOnce(ok(docs));
       await expect(runCli(argv('doc', 'list', 'yuque/help', '--json'))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
@@ -73,7 +73,7 @@ describe('doc commands', () => {
       expect(JSON.parse(stdoutText())).toEqual(docs);
     });
 
-    it('accepts a numeric repo id and spec query flags', async () => {
+    it('accepts a numeric book id and spec query flags', async () => {
       request.mockResolvedValueOnce(ok([]));
       await expect(
         runCli(
@@ -169,7 +169,7 @@ describe('doc commands', () => {
       body: '# Hello\n\nWorld.\n',
     };
 
-    it('with <repo> <doc> GETs {repoBase}/docs/{doc} and prints the raw body', async () => {
+    it('with <book> <doc> GETs {bookBase}/docs/{doc} and prints the raw body', async () => {
       request.mockResolvedValueOnce(ok(detail));
       await expect(runCli(argv('doc', 'get', 'yuque/help', 'intro'))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
@@ -217,7 +217,7 @@ describe('doc commands', () => {
   describe('doc create', () => {
     const created = { id: 7, slug: 'new-doc', title: 'New Doc' };
 
-    it('POSTs {repoBase}/docs with the spec body fields', async () => {
+    it('POSTs {bookBase}/docs with the spec body fields', async () => {
       request.mockResolvedValueOnce(ok(created));
       await expect(
         runCli(
@@ -283,7 +283,7 @@ describe('doc commands', () => {
   });
 
   describe('doc update', () => {
-    it('PUTs {repoBase}/docs/{doc} with only the given fields', async () => {
+    it('PUTs {bookBase}/docs/{doc} with only the given fields', async () => {
       request.mockResolvedValueOnce(ok({ id: 42, slug: 'intro', title: 'Renamed' }));
       await expect(
         runCli(argv('doc', 'update', 'yuque/help', 'intro', '--title', 'Renamed'))
@@ -305,7 +305,7 @@ describe('doc commands', () => {
   });
 
   describe('doc delete', () => {
-    it('--yes skips confirmation and DELETEs {repoBase}/docs/{doc}', async () => {
+    it('--yes skips confirmation and DELETEs {bookBase}/docs/{doc}', async () => {
       request.mockResolvedValueOnce(ok({ id: 42, slug: 'intro' }));
       await expect(runCli(argv('doc', 'delete', 'yuque/help', 'intro', '--yes'))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({

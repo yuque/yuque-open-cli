@@ -1,7 +1,7 @@
 import { UsageError } from '../errors.js';
 
 /**
- * A repo (知识库) reference given on the command line: either a numeric id
+ * A book (知识库) reference given on the command line: either a numeric id
  * or a `group/slug` namespace. Both map onto the same /repos/... URL shape.
  */
 export type BookRef =

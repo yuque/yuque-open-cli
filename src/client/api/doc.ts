@@ -44,7 +44,7 @@ export async function getDoc(http: YuqueHttp, repo: BookRef, doc: string): Promi
   return res.data;
 }
 
-/** Fetch a doc by its globally unique numeric id (no repo needed). */
+/** Fetch a doc by its globally unique numeric id (no book needed). */
 export async function getDocById(http: YuqueHttp, id: number): Promise<V2DocDetail> {
   const res = await http.get<ApiEnvelope<V2DocDetail>>(`/repos/docs/${id}`);
   return res.data;

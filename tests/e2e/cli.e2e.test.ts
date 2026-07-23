@@ -195,7 +195,7 @@ describeRead('read paths (personal token)', () => {
   });
 
   it('doc get --json returns a doc', () => {
-    if (!sampleDocSlug) return; // empty repo — nothing to fetch, skip vacuously
+    if (!sampleDocSlug) return; // empty book — nothing to fetch, skip vacuously
     expect(okJson(pc(['doc', 'get', readRepo, sampleDocSlug, '--json'])).id).toBeTruthy();
   });
 
@@ -302,8 +302,8 @@ describeWrite('write lifecycle (sandbox repo)', () => {
 
 const describeRepoLifecycle = REPO_LIFECYCLE_ENABLED && personalToken ? describe : describe.skip;
 describeRepoLifecycle('repo lifecycle (ephemeral repo, local only)', () => {
-  it('creates, reads, and deletes a repo', () => {
-    expect(configuredLogin, 'YUQUE_E2E_LOGIN is required for the repo lifecycle test').toBeTruthy();
+  it('creates, reads, and deletes a book', () => {
+    expect(configuredLogin, 'YUQUE_E2E_LOGIN is required for the book lifecycle test').toBeTruthy();
     const login = configuredLogin as string;
     const stamp = `${Date.now()}`;
     const created = okJson(

@@ -27,7 +27,7 @@ export function registerSearchCommands(program: Command): void {
     .description('Search docs or books')
     .argument('<query>', 'search keywords')
     .option('--type <type>', 'what to search for: doc or book (required)')
-    .option('--scope <ns>', 'restrict to a group or group/repo namespace')
+    .option('--scope <ns>', 'restrict to a group or group/book namespace')
     .option('--creator <login>', 'only results created by this user')
     .option('--page <n>', 'page number (page size is fixed at 20)', pageFlag);
   cmd.action(async (query: string) => {
