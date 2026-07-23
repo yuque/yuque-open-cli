@@ -16,10 +16,19 @@ function intFlag(flag: string): (value: string) => number {
   };
 }
 
-export function registerUserCommands(program: Command): void {
-  const user = program.command('user').description('inspect users and their groups');
+/** Spec enum for the user-groups role filter: 0 (admin) | 1 (member). */
+function roleFlag(value: string): number {
+  const role = intFlag('--role')(value);
+  if (role !== 0 && role !== 1) {
+    throw new UsageError(`--role must be 0 (admin) or 1 (member), got ${value}`);
+  }
+  return role;
+}
 
-  const info = user.command('info').description('show the authenticated user');
+export function registerUserCommands(program: Command): void {
+  const user = program.command('user').description('Inspect users and their groups');
+
+  const info = user.command('info').description('Show the authenticated user');
   info.action(async () => {
     const ctx = getContext(info);
     const me = await getCurrentUser(ctx.http);
@@ -43,9 +52,9 @@ export function registerUserCommands(program: Command): void {
 
   const groups = user
     .command('groups')
-    .description('list the groups a user belongs to')
+    .description('List the groups a user belongs to')
     .argument('<user>', 'user login or numeric id')
-    .option('--role <n>', 'filter by role (0: admin, 1: member)', intFlag('--role'))
+    .option('--role <n>', 'filter by role (0: admin, 1: member)', roleFlag)
     .option('--offset <n>', 'pagination offset (page size is fixed at 100)', intFlag('--offset'))
     .option('--all', 'fetch all pages');
   groups.action(async (userRef: string) => {

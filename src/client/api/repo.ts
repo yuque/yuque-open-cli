@@ -14,6 +14,8 @@ export interface ListReposOptions {
   limit?: number;
   /** Spec enum: Book | Design. Omit for no server-side filter. */
   type?: string;
+  /** e.g. `create_doc` — only repos where the token holds that ability. */
+  filterByAbility?: string;
 }
 
 export async function listRepos(
@@ -26,6 +28,7 @@ export async function listRepos(
   if (options.offset !== undefined) params.offset = options.offset;
   if (options.limit !== undefined) params.limit = options.limit;
   if (options.type !== undefined) params.type = options.type;
+  if (options.filterByAbility !== undefined) params.filterByAbility = options.filterByAbility;
   const res = await http.get<ApiEnvelope<V2Book[]>>(ownerReposPath(owner, login), params);
   return res.data;
 }
@@ -40,7 +43,7 @@ export interface CreateRepoBody {
   slug: string;
   description?: string;
   public?: number;
-  type?: string;
+  enhancedPrivacy?: boolean;
 }
 
 export async function createRepo(

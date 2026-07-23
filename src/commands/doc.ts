@@ -42,7 +42,11 @@ function parseIntFlag(value: string | undefined, flag: string): number | undefin
   if (!/^\d+$/.test(value)) {
     throw new UsageError(`${flag} expects a non-negative integer, got "${value}"`);
   }
-  return Number(value);
+  const parsed = Number(value);
+  if (flag === '--limit' && parsed > 100) {
+    throw new UsageError(`--limit is capped at 100 by the Yuque API, got ${parsed}`);
+  }
+  return parsed;
 }
 
 interface BodyOpts {

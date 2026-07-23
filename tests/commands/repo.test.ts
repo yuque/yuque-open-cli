@@ -176,15 +176,33 @@ describe('repo commands', () => {
     it('creates a group repo with all optional fields', async () => {
       request.mockResolvedValueOnce(envelope(BOOK));
       const args = ['repo', 'create', 'mygroup', '--group', '--name', 'Docs', '--slug', 'docs'];
-      args.push('--description', 'd', '--public', '2', '--type', 'Book', '--json');
+      args.push('--description', 'd', '--public', '2', '--enhanced-privacy', '--json');
       await expect(runCli(argv(...args))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
         method: 'post',
         url: '/groups/mygroup/repos',
         params: undefined,
-        data: { name: 'Docs', slug: 'docs', description: 'd', public: 2, type: 'Book' },
+        data: { name: 'Docs', slug: 'docs', description: 'd', public: 2, enhancedPrivacy: true },
       });
       expect(JSON.parse(stdoutText())).toEqual(BOOK);
+    });
+
+    it('rejects a --limit above the spec cap on repo list', async () => {
+      const args = ['repo', 'list', 'yuque', '--limit', '101'];
+      await expect(runCli(argv(...args))).resolves.toBe(2);
+      expect(request).not.toHaveBeenCalled();
+    });
+
+    it('passes --filter-by-ability through to the query', async () => {
+      request.mockResolvedValueOnce(envelope([BOOK]));
+      const args = ['repo', 'list', 'yuque', '--filter-by-ability', 'create_doc', '--json'];
+      await expect(runCli(argv(...args))).resolves.toBe(0);
+      expect(request).toHaveBeenCalledWith({
+        method: 'get',
+        url: '/users/yuque/repos',
+        params: { filterByAbility: 'create_doc' },
+        data: undefined,
+      });
     });
   });
 

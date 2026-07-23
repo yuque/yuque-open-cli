@@ -99,6 +99,14 @@ function parsePositiveInt(flag: string): (value: string) => number {
   };
 }
 
+function limitFlag(value: string): number {
+  const limit = parsePositiveInt('--limit')(value);
+  if (limit > MAX_PAGE_SIZE) {
+    throw new UsageError(`--limit is capped at ${MAX_PAGE_SIZE} by the Yuque API, got ${limit}`);
+  }
+  return limit;
+}
+
 // Enum validation lives in argParsers (not Option.choices) so violations throw
 // UsageError and exit 2; commander's own choices error path calls process.exit
 // on subcommands created before runCli installs exitOverride on the root.
@@ -120,7 +128,7 @@ function withListOptions(cmd: Command, sortFields: string[]): Command {
     .option('--name <name>', 'filter by name')
     .option('--range <days>', 'time range in days: 0 (all time), 30 or 365', parseRange)
     .option('--page <n>', 'page number', parsePositiveInt('--page'))
-    .option('--limit <n>', 'page size (max 20)', parsePositiveInt('--limit'))
+    .option('--limit <n>', 'page size (max 20)', limitFlag)
     .option(
       '--sort-field <field>',
       `field to sort by: ${sortFields.join(', ')}`,

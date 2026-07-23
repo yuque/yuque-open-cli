@@ -13,13 +13,16 @@ function pageFlag(value: string): number {
   if (!/^\d+$/.test(value) || Number(value) < 1) {
     throw new UsageError(`--page expects a positive integer, got "${value}"`);
   }
+  if (Number(value) > 100) {
+    throw new UsageError(`--page is capped at 100 by the Yuque API, got ${value}`);
+  }
   return Number(value);
 }
 
 export function registerSearchCommands(program: Command): void {
   const cmd = program
     .command('search')
-    .description('search docs or repos')
+    .description('Search docs or repos')
     .argument('<query>', 'search keywords')
     .option('--type <type>', 'what to search for: doc or repo (required)')
     .option('--scope <ns>', 'restrict to a group or group/repo namespace')

@@ -7,7 +7,7 @@ import { getCurrentUser, hello } from '../client/api/user.js';
 export function registerAuthCommands(program: Command): void {
   const ping = program
     .command('ping')
-    .description('check connectivity and token validity against the Yuque API');
+    .description('Check connectivity and token validity against the Yuque API');
   ping.action(async () => {
     const ctx = getContext(ping);
     const data = await hello(ctx.http);
@@ -18,8 +18,8 @@ export function registerAuthCommands(program: Command): void {
     printOk(data.message ?? 'ok');
   });
 
-  const auth = program.command('auth').description('authentication status');
-  const status = auth.command('status').description('show which account the token belongs to');
+  const auth = program.command('auth').description('Authentication status');
+  const status = auth.command('status').description('Show which account the token belongs to');
   status.action(async () => {
     const ctx = getContext(status);
     const user = await getCurrentUser(ctx.http);

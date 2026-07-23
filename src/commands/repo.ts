@@ -24,6 +24,13 @@ function parseNonNegativeInt(value: string): number {
   return Number(value);
 }
 
+/** The spec caps `limit` at 100 for repo listing. */
+function parseLimit(value: string): number {
+  const limit = parseNonNegativeInt(value);
+  if (limit > 100) throw new UsageError(`--limit is capped at 100 by the Yuque API, got ${limit}`);
+  return limit;
+}
+
 const LIST_TYPES = ['Book', 'Design', 'all'];
 
 /** `all` (like omitting the flag) means no server-side filter; the spec enum is Book|Design. */
@@ -48,25 +55,38 @@ export function registerRepoCommands(program: Command): void {
     .argument('<login>', 'user/group login or id')
     .option('--group', 'treat <login> as a group instead of a user')
     .option('--type <type>', 'filter by repo type: Book, Design, or all')
+    .option(
+      '--filter-by-ability <ability>',
+      'only repos where the token has this ability, e.g. create_doc'
+    )
     .option('--offset <n>', 'pagination offset', parseNonNegativeInt)
-    .option('--limit <n>', 'page size, max 100', parseNonNegativeInt)
+    .option('--limit <n>', 'page size, max 100', parseLimit)
     .option('--all', 'fetch every page (overrides --offset/--limit)')
     .action(
       async (
         login: string,
-        opts: { group?: boolean; type?: string; offset?: number; limit?: number; all?: boolean }
+        opts: {
+          group?: boolean;
+          type?: string;
+          filterByAbility?: string;
+          offset?: number;
+          limit?: number;
+          all?: boolean;
+        }
       ) => {
         const type = typeFilter(opts.type);
         const ctx = getContext(list);
         const owner: RepoOwner = opts.group ? 'group' : 'user';
+        const filterByAbility = opts.filterByAbility;
         const books = opts.all
           ? await fetchAllPages((offset, limit) =>
-              listRepos(ctx.http, owner, login, { offset, limit, type })
+              listRepos(ctx.http, owner, login, { offset, limit, type, filterByAbility })
             )
           : await listRepos(ctx.http, owner, login, {
               offset: opts.offset,
               limit: opts.limit,
               type,
+              filterByAbility,
             });
         if (ctx.json) {
           printJson(books);
@@ -116,7 +136,7 @@ export function registerRepoCommands(program: Command): void {
     .option('--group', 'create under a group instead of a user')
     .option('--description <description>', 'repo description')
     .option('--public <n>', 'visibility: 0 private, 1 public, 2 org-only', parseNonNegativeInt)
-    .option('--type <type>', 'repo type, e.g. Book')
+    .option('--enhanced-privacy', 'restrict access to team admins only (增强私密性)')
     .action(
       async (
         login: string,
@@ -126,14 +146,14 @@ export function registerRepoCommands(program: Command): void {
           group?: boolean;
           description?: string;
           public?: number;
-          type?: string;
+          enhancedPrivacy?: boolean;
         }
       ) => {
         const ctx = getContext(create);
         const body: CreateRepoBody = { name: opts.name, slug: opts.slug };
         if (opts.description !== undefined) body.description = opts.description;
         if (opts.public !== undefined) body.public = opts.public;
-        if (opts.type !== undefined) body.type = opts.type;
+        if (opts.enhancedPrivacy) body.enhancedPrivacy = true;
         const book = await createRepo(ctx.http, opts.group ? 'group' : 'user', login, body);
         if (ctx.json) {
           printJson(book);
