@@ -72,9 +72,10 @@ bin.ts → cli.ts (commander program, error → exit code)
 3. For a new domain, add the import at the top of `src/cli.ts` and call its register function inside `buildProgram`.
 4. Update the `OPERATION_TO_COMMANDS` operationId + method + path tuples and `EXPECTED_LEAF_COMMANDS` in `tests/spec-coverage.test.ts`.
 5. Update `README.md` and `README.zh-CN.md`: increment each commands-section heading count and add an isomorphic command-table row; `tests/docs/command-surface-docs.test.ts` locks both.
-6. Add `tests/commands/` unit coverage with exact request assertions and the expected process exit code.
-7. Add a `tests/e2e/` mock-suite case with wire-level request assertions against the built binary.
-8. Run `npm run check` and require the complete gate to pass.
+6. Regenerate the pinned help surface — `UPDATE_HELP_GOLDEN=1 npx vitest run tests/docs/help-surface.test.ts` — and review the `tests/docs/help-surface.golden.json` diff; any new or changed flag must appear there deliberately.
+7. Add `tests/commands/` unit coverage with exact request assertions and the expected process exit code.
+8. Add a `tests/e2e/` mock-suite case with wire-level request assertions against the built binary.
+9. Run `npm run check` and require the complete gate to pass.
 
 ## Conventions & gotchas
 

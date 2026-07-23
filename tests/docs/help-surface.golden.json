@@ -1,0 +1,729 @@
+{
+  "globalOptions": [
+    {
+      "flags": "--host <host>",
+      "description": "Yuque host, e.g. https://your-space.yuque.com (overrides YUQUE_HOST)"
+    },
+    {
+      "flags": "--json",
+      "description": "print the full API response as JSON"
+    },
+    {
+      "flags": "--timeout <ms>",
+      "description": "API request timeout in milliseconds (overrides YUQUE_TIMEOUT_MS, default 30000)"
+    },
+    {
+      "flags": "--token <token>",
+      "description": "Yuque API token (overrides YUQUE_TOKEN / YUQUE_PERSONAL_TOKEN)"
+    }
+  ],
+  "commands": [
+    {
+      "path": "auth status",
+      "description": "Show which account the token belongs to",
+      "arguments": [],
+      "options": []
+    },
+    {
+      "path": "book create",
+      "description": "Create a book under a user or group",
+      "arguments": [
+        {
+          "name": "login",
+          "required": true,
+          "description": "owner user/group login or id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--description <description>",
+          "description": "book description"
+        },
+        {
+          "flags": "--enhanced-privacy",
+          "description": "restrict access to team admins only (增强私密性)"
+        },
+        {
+          "flags": "--group",
+          "description": "create under a group instead of a user"
+        },
+        {
+          "flags": "--name <name>",
+          "description": "book name (required)"
+        },
+        {
+          "flags": "--public <n>",
+          "description": "visibility: 0 private, 1 public, 2 org-only"
+        },
+        {
+          "flags": "--slug <slug>",
+          "description": "book path (slug) (required)"
+        }
+      ]
+    },
+    {
+      "path": "book delete",
+      "description": "Delete a book",
+      "arguments": [
+        {
+          "name": "book",
+          "required": true,
+          "description": "book id or group/slug namespace",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--yes",
+          "description": "skip the confirmation prompt"
+        }
+      ]
+    },
+    {
+      "path": "book get",
+      "description": "Show the details of a book",
+      "arguments": [
+        {
+          "name": "book",
+          "required": true,
+          "description": "book id or group/slug namespace",
+          "variadic": false
+        }
+      ],
+      "options": []
+    },
+    {
+      "path": "book list",
+      "description": "List the books (知识库) of a user or group",
+      "arguments": [
+        {
+          "name": "login",
+          "required": true,
+          "description": "user/group login or id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--all",
+          "description": "fetch every page (overrides --offset/--limit)"
+        },
+        {
+          "flags": "--filter-by-ability <ability>",
+          "description": "only books where the token has this ability, e.g. create_doc"
+        },
+        {
+          "flags": "--group",
+          "description": "treat <login> as a group instead of a user"
+        },
+        {
+          "flags": "--limit <n>",
+          "description": "page size, max 100"
+        },
+        {
+          "flags": "--offset <n>",
+          "description": "pagination offset"
+        },
+        {
+          "flags": "--type <type>",
+          "description": "filter by book type: Book, Design, or all"
+        }
+      ]
+    },
+    {
+      "path": "book update",
+      "description": "Update the settings of a book",
+      "arguments": [
+        {
+          "name": "book",
+          "required": true,
+          "description": "book id or group/slug namespace",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--description <description>",
+          "description": "new description"
+        },
+        {
+          "flags": "--name <name>",
+          "description": "new name"
+        },
+        {
+          "flags": "--public <n>",
+          "description": "visibility: 0 private, 1 public, 2 org-only"
+        },
+        {
+          "flags": "--slug <slug>",
+          "description": "new path (slug)"
+        },
+        {
+          "flags": "--toc <markdown>",
+          "description": "replace the table of contents (Markdown list)"
+        }
+      ]
+    },
+    {
+      "path": "doc create",
+      "description": "Create a doc in a book",
+      "arguments": [
+        {
+          "name": "book",
+          "required": true,
+          "description": "book id or group/slug namespace",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--body <content>",
+          "description": "doc body content"
+        },
+        {
+          "flags": "--body-file <path>",
+          "description": "read the doc body from a file"
+        },
+        {
+          "flags": "--format <format>",
+          "description": "content format",
+          "choices": ["markdown", "html", "lake"]
+        },
+        {
+          "flags": "--public <level>",
+          "description": "visibility (0 private, 1 public, 2 org-only)",
+          "choices": ["0", "1", "2"]
+        },
+        {
+          "flags": "--slug <slug>",
+          "description": "doc slug (URL path)"
+        },
+        {
+          "flags": "--title <title>",
+          "description": "doc title (required)"
+        }
+      ]
+    },
+    {
+      "path": "doc delete",
+      "description": "Delete a doc",
+      "arguments": [
+        {
+          "name": "book",
+          "required": true,
+          "description": "book id or group/slug namespace",
+          "variadic": false
+        },
+        {
+          "name": "doc",
+          "required": true,
+          "description": "doc slug or id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--yes",
+          "description": "skip the confirmation prompt"
+        }
+      ]
+    },
+    {
+      "path": "doc get",
+      "description": "Show a doc: `doc get <book> <doc>` or `doc get <doc-id>`",
+      "arguments": [
+        {
+          "name": "target",
+          "required": true,
+          "description": "<book> <doc slug or id>, or a single global numeric doc id",
+          "variadic": true
+        }
+      ],
+      "options": [
+        {
+          "flags": "--meta",
+          "description": "print metadata instead of the body"
+        }
+      ]
+    },
+    {
+      "path": "doc list",
+      "description": "List the docs of a book",
+      "arguments": [
+        {
+          "name": "book",
+          "required": true,
+          "description": "book id or group/slug namespace",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--all",
+          "description": "fetch all pages (overrides --offset/--limit)"
+        },
+        {
+          "flags": "--changed-at-gte <datetime>",
+          "description": "only docs changed at or after this ISO 8601 time"
+        },
+        {
+          "flags": "--deleted",
+          "description": "list deleted docs"
+        },
+        {
+          "flags": "--limit <n>",
+          "description": "page size (max 100)"
+        },
+        {
+          "flags": "--offset <n>",
+          "description": "pagination offset"
+        },
+        {
+          "flags": "--optional-properties <fields>",
+          "description": "extra fields, comma-separated: hits, tags, latest_version_id"
+        }
+      ]
+    },
+    {
+      "path": "doc update",
+      "description": "Update a doc (only the given fields are changed)",
+      "arguments": [
+        {
+          "name": "book",
+          "required": true,
+          "description": "book id or group/slug namespace",
+          "variadic": false
+        },
+        {
+          "name": "doc",
+          "required": true,
+          "description": "doc slug or id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--body <content>",
+          "description": "doc body content"
+        },
+        {
+          "flags": "--body-file <path>",
+          "description": "read the doc body from a file"
+        },
+        {
+          "flags": "--format <format>",
+          "description": "content format",
+          "choices": ["markdown", "html", "lake"]
+        },
+        {
+          "flags": "--public <level>",
+          "description": "visibility (0 private, 1 public, 2 org-only)",
+          "choices": ["0", "1", "2"]
+        },
+        {
+          "flags": "--slug <slug>",
+          "description": "doc slug (URL path)"
+        },
+        {
+          "flags": "--title <title>",
+          "description": "doc title"
+        }
+      ]
+    },
+    {
+      "path": "doc version",
+      "description": "Show one published version of a doc",
+      "arguments": [
+        {
+          "name": "version-id",
+          "required": true,
+          "description": "numeric version id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--meta",
+          "description": "print metadata instead of the body"
+        }
+      ]
+    },
+    {
+      "path": "doc versions",
+      "description": "List the published versions of a doc (most recent 100)",
+      "arguments": [
+        {
+          "name": "doc-id",
+          "required": true,
+          "description": "numeric doc id",
+          "variadic": false
+        }
+      ],
+      "options": []
+    },
+    {
+      "path": "group member remove",
+      "description": "Remove a member from a group",
+      "arguments": [
+        {
+          "name": "login",
+          "required": true,
+          "description": "group login or numeric id",
+          "variadic": false
+        },
+        {
+          "name": "user",
+          "required": true,
+          "description": "user login or numeric id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--yes",
+          "description": "skip the confirmation prompt"
+        }
+      ]
+    },
+    {
+      "path": "group member set",
+      "description": "Add a member to a group or change their role",
+      "arguments": [
+        {
+          "name": "login",
+          "required": true,
+          "description": "group login or numeric id",
+          "variadic": false
+        },
+        {
+          "name": "user",
+          "required": true,
+          "description": "user login or numeric id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--role <role>",
+          "description": "role (0: admin, 1: member, 2: read-only) (required)",
+          "choices": ["0", "1", "2"]
+        }
+      ]
+    },
+    {
+      "path": "group members",
+      "description": "List members of a group",
+      "arguments": [
+        {
+          "name": "login",
+          "required": true,
+          "description": "group login or numeric id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--all",
+          "description": "fetch all pages"
+        },
+        {
+          "flags": "--offset <n>",
+          "description": "pagination offset (page size is fixed at 100 by the API)"
+        },
+        {
+          "flags": "--role <role>",
+          "description": "filter by role (0: admin, 1: member, 2: read-only)",
+          "choices": ["0", "1", "2"]
+        }
+      ]
+    },
+    {
+      "path": "ping",
+      "description": "Check connectivity and token validity against the Yuque API",
+      "arguments": [],
+      "options": []
+    },
+    {
+      "path": "search",
+      "description": "Search docs or books",
+      "arguments": [
+        {
+          "name": "query",
+          "required": true,
+          "description": "search keywords",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--creator <login>",
+          "description": "only results created by this user"
+        },
+        {
+          "flags": "--page <n>",
+          "description": "page number (page size is fixed at 20)"
+        },
+        {
+          "flags": "--scope <ns>",
+          "description": "restrict to a group or group/book namespace"
+        },
+        {
+          "flags": "--type <type>",
+          "description": "what to search for: doc or book (required)"
+        }
+      ]
+    },
+    {
+      "path": "stats books",
+      "description": "Per-book statistics for a group",
+      "arguments": [
+        {
+          "name": "login",
+          "required": true,
+          "description": "",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--all",
+          "description": "fetch every page (takes precedence over --page/--limit)"
+        },
+        {
+          "flags": "--limit <n>",
+          "description": "page size (max 20)"
+        },
+        {
+          "flags": "--name <name>",
+          "description": "filter by name"
+        },
+        {
+          "flags": "--page <n>",
+          "description": "page number"
+        },
+        {
+          "flags": "--range <days>",
+          "description": "time range in days: 0 (all time), 30 or 365"
+        },
+        {
+          "flags": "--sort-field <field>",
+          "description": "field to sort by: content_updated_at_ms, word_count, post_count, read_count, like_count, watch_count, comment_count"
+        },
+        {
+          "flags": "--sort-order <order>",
+          "description": "sort direction: desc or asc"
+        }
+      ]
+    },
+    {
+      "path": "stats docs",
+      "description": "Per-doc statistics for a group",
+      "arguments": [
+        {
+          "name": "login",
+          "required": true,
+          "description": "",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--all",
+          "description": "fetch every page (takes precedence over --page/--limit)"
+        },
+        {
+          "flags": "--book-id <id>",
+          "description": "only docs in this book (book id)"
+        },
+        {
+          "flags": "--limit <n>",
+          "description": "page size (max 20)"
+        },
+        {
+          "flags": "--name <name>",
+          "description": "filter by name"
+        },
+        {
+          "flags": "--page <n>",
+          "description": "page number"
+        },
+        {
+          "flags": "--range <days>",
+          "description": "time range in days: 0 (all time), 30 or 365"
+        },
+        {
+          "flags": "--sort-field <field>",
+          "description": "field to sort by: content_updated_at, word_count, read_count, like_count, comment_count, created_at"
+        },
+        {
+          "flags": "--sort-order <order>",
+          "description": "sort direction: desc or asc"
+        }
+      ]
+    },
+    {
+      "path": "stats group",
+      "description": "Aggregate statistics for a group",
+      "arguments": [
+        {
+          "name": "login",
+          "required": true,
+          "description": "",
+          "variadic": false
+        }
+      ],
+      "options": []
+    },
+    {
+      "path": "stats members",
+      "description": "Per-member statistics for a group",
+      "arguments": [
+        {
+          "name": "login",
+          "required": true,
+          "description": "",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--all",
+          "description": "fetch every page (takes precedence over --page/--limit)"
+        },
+        {
+          "flags": "--limit <n>",
+          "description": "page size (max 20)"
+        },
+        {
+          "flags": "--name <name>",
+          "description": "filter by name"
+        },
+        {
+          "flags": "--page <n>",
+          "description": "page number"
+        },
+        {
+          "flags": "--range <days>",
+          "description": "time range in days: 0 (all time), 30 or 365"
+        },
+        {
+          "flags": "--sort-field <field>",
+          "description": "field to sort by: write_doc_count, write_count, read_count, like_count"
+        },
+        {
+          "flags": "--sort-order <order>",
+          "description": "sort direction: desc or asc"
+        }
+      ]
+    },
+    {
+      "path": "toc get",
+      "description": "Show the toc of a book as an indented tree",
+      "arguments": [
+        {
+          "name": "book",
+          "required": true,
+          "description": "book id or group/slug namespace",
+          "variadic": false
+        }
+      ],
+      "options": []
+    },
+    {
+      "path": "toc update",
+      "description": "Update the toc of a book (append/prepend/edit/remove nodes)",
+      "arguments": [
+        {
+          "name": "book",
+          "required": true,
+          "description": "book id or group/slug namespace",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--action <action>",
+          "description": "operation: appendNode (append), prependNode (prepend), editNode, removeNode (required); move a node: appendNode/prependNode + --node-uuid",
+          "choices": ["appendNode", "prependNode", "editNode", "removeNode"]
+        },
+        {
+          "flags": "--action-mode <mode>",
+          "description": "operation mode: sibling or child",
+          "choices": ["sibling", "child"]
+        },
+        {
+          "flags": "--doc-id <id>",
+          "description": "doc id (deprecated, use --doc-ids)"
+        },
+        {
+          "flags": "--doc-ids <ids>",
+          "description": "comma-separated doc ids, required to create DOC nodes"
+        },
+        {
+          "flags": "--node-uuid <uuid>",
+          "description": "node uuid to move/edit/remove (from `yuque toc get`)"
+        },
+        {
+          "flags": "--open-window <n>",
+          "description": "open LINK in a new window (0: same page, 1: new)",
+          "choices": ["0", "1"]
+        },
+        {
+          "flags": "--target-uuid <uuid>",
+          "description": "target node uuid (defaults to the root node)"
+        },
+        {
+          "flags": "--title <title>",
+          "description": "node title, required to create TITLE/LINK nodes"
+        },
+        {
+          "flags": "--type <type>",
+          "description": "node type: DOC (document), LINK, TITLE (group)",
+          "choices": ["DOC", "LINK", "TITLE"]
+        },
+        {
+          "flags": "--url <url>",
+          "description": "node url, required to create LINK nodes"
+        },
+        {
+          "flags": "--visible <n>",
+          "description": "node visibility (0: hidden, 1: visible)",
+          "choices": ["0", "1"]
+        }
+      ]
+    },
+    {
+      "path": "user groups",
+      "description": "List the groups a user belongs to",
+      "arguments": [
+        {
+          "name": "user",
+          "required": true,
+          "description": "user login or numeric id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--all",
+          "description": "fetch all pages (overrides --offset)"
+        },
+        {
+          "flags": "--offset <n>",
+          "description": "pagination offset (page size is fixed at 100)"
+        },
+        {
+          "flags": "--role <n>",
+          "description": "filter by role (0: admin, 1: member)"
+        }
+      ]
+    },
+    {
+      "path": "user info",
+      "description": "Show the authenticated user",
+      "arguments": [],
+      "options": []
+    }
+  ]
+}
