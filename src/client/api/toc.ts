@@ -1,5 +1,5 @@
 import type { YuqueHttp } from '../http.js';
-import { repoBasePath, type RepoRef } from '../repo-ref.js';
+import { bookBasePath, type BookRef } from '../book-ref.js';
 import type { ApiEnvelope, V2TocItem } from '../types.js';
 
 /** Body for PUT /repos/.../toc — mirrors the spec requestBody field-for-field. */
@@ -18,16 +18,16 @@ export interface TocUpdateBody {
   visible?: number;
 }
 
-export async function getToc(http: YuqueHttp, repo: RepoRef): Promise<V2TocItem[]> {
-  const res = await http.get<ApiEnvelope<V2TocItem[]>>(`${repoBasePath(repo)}/toc`);
+export async function getToc(http: YuqueHttp, repo: BookRef): Promise<V2TocItem[]> {
+  const res = await http.get<ApiEnvelope<V2TocItem[]>>(`${bookBasePath(repo)}/toc`);
   return res.data;
 }
 
 export async function updateToc(
   http: YuqueHttp,
-  repo: RepoRef,
+  repo: BookRef,
   body: TocUpdateBody
 ): Promise<V2TocItem[]> {
-  const res = await http.put<ApiEnvelope<V2TocItem[]>>(`${repoBasePath(repo)}/toc`, body);
+  const res = await http.put<ApiEnvelope<V2TocItem[]>>(`${bookBasePath(repo)}/toc`, body);
   return res.data;
 }

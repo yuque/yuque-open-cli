@@ -67,7 +67,7 @@ describe('retry semantics through the real binary', () => {
       status: 502,
       body: { message: 'bad gateway' },
     });
-    const result = await runYuque(['repo', 'create', 'me', '--name', 'n', '--slug', 's'], { host });
+    const result = await runYuque(['book', 'create', 'me', '--name', 'n', '--slug', 's'], { host });
     expect(result.code).toBe(1);
     expect(server.requestsFor('POST', '/api/v2/users/me/repos')).toHaveLength(1);
   });

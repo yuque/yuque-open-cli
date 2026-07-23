@@ -18,7 +18,7 @@ Once authenticated, your knowledge base is one command away:
 yuque search "canary release" --type doc          # find that doc you half-remember
 yuque doc get team/handbook onboarding > onboarding.md
 yuque doc create team/notes --title "Weekly sync" --body-file weekly.md
-yuque repo list my-team --group --all --json | jq '.[].name'
+yuque book list my-team --group --all --json | jq '.[].name'
 ```
 
 ## Quick Start
@@ -42,7 +42,7 @@ YUQUE_TOKEN=YOUR_TOKEN npx yuque-open-cli auth status
 
 </details>
 
-**3. Start exploring** — `yuque repo list your-login`, then `yuque doc list <repo>`.
+**3. Start exploring** — `yuque book list your-login`, then `yuque doc list <book>`.
 
 ## Configuration
 
@@ -64,30 +64,30 @@ Each command maps to the [Yuque OpenAPI](https://www.yuque.com/yuque/developer/a
 |            | `auth status`                        | Show who you are signed in as                                                      |
 | **User**   | `user info`                          | Show the authenticated user                                                        |
 |            | `user groups <user>`                 | List groups a user belongs to                                                      |
-| **Search** | `search <query>`                     | Search docs or repos, with paging                                                  |
-| **Repos**  | `repo list <login>`                  | List repos (知识库) of a user or `--group`                                         |
-|            | `repo get <repo>`                    | Show a repo by id or `owner/slug`                                                  |
-|            | `repo create <login>`                | Create a repo                                                                      |
-|            | `repo update <repo>`                 | Update name, slug, description, visibility, or TOC                                 |
-|            | `repo delete <repo>`                 | Delete a repo — asks for confirmation                                              |
-| **Docs**   | `doc list <repo>`                    | List docs in a repo, `--all` drains paging                                         |
-|            | `doc get <repo> <doc>`               | Print a doc's markdown body; also takes a global `<doc-id>`, `--meta` for metadata |
-|            | `doc create <repo>`                  | Create a doc from `--body` or `--body-file`                                        |
-|            | `doc update <repo> <doc>`            | Update a doc's body or metadata                                                    |
-|            | `doc delete <repo> <doc>`            | Delete a doc — asks for confirmation                                               |
+| **Search** | `search <query>`                     | Search docs or books, with paging                                                  |
+| **Books**  | `book list <login>`                  | List books (知识库) of a user or `--group`                                         |
+|            | `book get <book>`                    | Show a book by id or `owner/slug`                                                  |
+|            | `book create <login>`                | Create a book                                                                      |
+|            | `book update <book>`                 | Update name, slug, description, visibility, or TOC                                 |
+|            | `book delete <book>`                 | Delete a book — asks for confirmation                                              |
+| **Docs**   | `doc list <book>`                    | List docs in a book, `--all` drains paging                                         |
+|            | `doc get <book> <doc>`               | Print a doc's markdown body; also takes a global `<doc-id>`, `--meta` for metadata |
+|            | `doc create <book>`                  | Create a doc from `--body` or `--body-file`                                        |
+|            | `doc update <book> <doc>`            | Update a doc's body or metadata                                                    |
+|            | `doc delete <book> <doc>`            | Delete a doc — asks for confirmation                                               |
 |            | `doc versions <doc-id>`              | List a doc's version history                                                       |
 |            | `doc version <version-id>`           | Show one version's content                                                         |
-| **TOC**    | `toc get <repo>`                     | Print a repo's table of contents as a tree                                         |
-|            | `toc update <repo>`                  | Append, prepend, edit, or remove a TOC node                                        |
+| **TOC**    | `toc get <book>`                     | Print a book's table of contents as a tree                                         |
+|            | `toc update <book>`                  | Append, prepend, edit, or remove a TOC node                                        |
 | **Groups** | `group members <login>`              | List members of a group                                                            |
 |            | `group member set <login> <user>`    | Add a member or change their role                                                  |
 |            | `group member remove <login> <user>` | Remove a member — asks for confirmation                                            |
 | **Stats**  | `stats group <login>`                | Group-level statistics                                                             |
 |            | `stats members <login>`              | Per-member statistics                                                              |
-|            | `stats books <login>`                | Per-repo statistics                                                                |
+|            | `stats books <login>`                | Per-book statistics                                                                |
 |            | `stats docs <login>`                 | Per-doc statistics                                                                 |
 
-Repos accept either a numeric id or an `owner/slug` namespace everywhere. Run `yuque <command> --help` for all flags.
+Books (知识库) accept either a numeric id or an `owner/slug` namespace everywhere. Run `yuque <command> --help` for all flags.
 
 ## Output & scripting
 
@@ -121,7 +121,7 @@ Colors are disabled automatically when piping, or force-off with `NO_COLOR=1`. R
 | `A Yuque API token is required`                    | Set `YUQUE_TOKEN=YOUR_TOKEN` or pass `--token=YOUR_TOKEN`                                      |
 | `token invalid or expired` (exit `3`)              | [Regenerate the token](https://www.yuque.com/settings/tokens) or fix `YUQUE_TOKEN` / `--token` |
 | `rate limited by the Yuque API` (exit `5`)         | The CLI retries automatically; slow down `--all` loops                                         |
-| `the requested resource does not exist` (exit `4`) | Check the repo id / `owner/slug` namespace and the doc slug                                    |
+| `the requested resource does not exist` (exit `4`) | Check the book id / `owner/slug` namespace and the doc slug                                    |
 | `npm` command not found                            | Install [Node.js](https://nodejs.org/) v20 or later                                            |
 
 ## Development

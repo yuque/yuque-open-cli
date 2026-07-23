@@ -4,7 +4,7 @@ import { CliError, YuqueError, exitCodeForStatus } from './errors.js';
 import { registerAuthCommands } from './commands/auth.js';
 import { registerUserCommands } from './commands/user.js';
 import { registerSearchCommands } from './commands/search.js';
-import { registerRepoCommands } from './commands/repo.js';
+import { registerBookCommands } from './commands/book.js';
 import { registerDocCommands } from './commands/doc.js';
 import { registerTocCommands } from './commands/toc.js';
 import { registerGroupCommands } from './commands/group.js';
@@ -34,7 +34,7 @@ export function buildProgram(): Command {
   registerAuthCommands(program);
   registerUserCommands(program);
   registerSearchCommands(program);
-  registerRepoCommands(program);
+  registerBookCommands(program);
   registerDocCommands(program);
   registerTocCommands(program);
   registerGroupCommands(program);

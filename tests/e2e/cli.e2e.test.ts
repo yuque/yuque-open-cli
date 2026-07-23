@@ -108,7 +108,7 @@ describeRead('read paths (personal token)', () => {
     for (const candidate of candidates) {
       // Only Book repos serve the /docs and /toc endpoints — a Design (board)
       // repo as the account's first repo would 404 them, so filter server-side.
-      const res = pc(['repo', 'list', candidate, '--type', 'Book', '--json']);
+      const res = pc(['book', 'list', candidate, '--type', 'Book', '--json']);
       if (res.code === 0) {
         owner = candidate;
         repos = JSON.parse(res.stdout);
@@ -130,7 +130,7 @@ describeRead('read paths (personal token)', () => {
       // Later runs discover it through the Book listing above and skip this.
       const created = okJson(
         pc([
-          'repo',
+          'book',
           'create',
           owner,
           '--name',
@@ -182,12 +182,12 @@ describeRead('read paths (personal token)', () => {
     expect(Array.isArray(okJson(pc(['search', 'test', '--type', 'doc', '--json'])))).toBe(true);
   });
 
-  it('repo list --json returns an array', () => {
-    expect(Array.isArray(okJson(pc(['repo', 'list', owner, '--json'])))).toBe(true);
+  it('book list --json returns an array', () => {
+    expect(Array.isArray(okJson(pc(['book', 'list', owner, '--json'])))).toBe(true);
   });
 
-  it('repo get --json returns the repo', () => {
-    expect(okJson(pc(['repo', 'get', readRepo, '--json'])).id).toBeTruthy();
+  it('book get --json returns the book', () => {
+    expect(okJson(pc(['book', 'get', readRepo, '--json'])).id).toBeTruthy();
   });
 
   it('doc list --json returns an array', () => {
@@ -195,7 +195,7 @@ describeRead('read paths (personal token)', () => {
   });
 
   it('doc get --json returns a doc', () => {
-    if (!sampleDocSlug) return; // empty repo — nothing to fetch, skip vacuously
+    if (!sampleDocSlug) return; // empty book — nothing to fetch, skip vacuously
     expect(okJson(pc(['doc', 'get', readRepo, sampleDocSlug, '--json'])).id).toBeTruthy();
   });
 
@@ -214,8 +214,8 @@ describeError('error contract', () => {
     expect(res.code).toBe(3);
   });
 
-  it('a nonexistent repo exits 4 (not found)', () => {
-    expect(pc(['repo', 'get', '999999999']).code).toBe(4);
+  it('a nonexistent book exits 4 (not found)', () => {
+    expect(pc(['book', 'get', '999999999']).code).toBe(4);
   });
 });
 
@@ -302,13 +302,13 @@ describeWrite('write lifecycle (sandbox repo)', () => {
 
 const describeRepoLifecycle = REPO_LIFECYCLE_ENABLED && personalToken ? describe : describe.skip;
 describeRepoLifecycle('repo lifecycle (ephemeral repo, local only)', () => {
-  it('creates, reads, and deletes a repo', () => {
-    expect(configuredLogin, 'YUQUE_E2E_LOGIN is required for the repo lifecycle test').toBeTruthy();
+  it('creates, reads, and deletes a book', () => {
+    expect(configuredLogin, 'YUQUE_E2E_LOGIN is required for the book lifecycle test').toBeTruthy();
     const login = configuredLogin as string;
     const stamp = `${Date.now()}`;
     const created = okJson(
       pc([
-        'repo',
+        'book',
         'create',
         login,
         '--name',
@@ -321,9 +321,9 @@ describeRepoLifecycle('repo lifecycle (ephemeral repo, local only)', () => {
     expect(created.id).toBeTruthy();
     const id = String(created.id);
     try {
-      expect(okJson(pc(['repo', 'get', id, '--json'])).id).toBeTruthy();
+      expect(okJson(pc(['book', 'get', id, '--json'])).id).toBeTruthy();
     } finally {
-      expect(pc(['repo', 'delete', id, '--yes']).code).toBe(0);
+      expect(pc(['book', 'delete', id, '--yes']).code).toBe(0);
     }
   });
 });

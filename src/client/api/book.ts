@@ -1,15 +1,15 @@
 import type { YuqueHttp } from '../http.js';
-import { repoBasePath, type RepoRef } from '../repo-ref.js';
+import { bookBasePath, type BookRef } from '../book-ref.js';
 import type { ApiEnvelope, V2Book, V2BookDetail } from '../types.js';
 
 /** The spec exposes list/create under both /users/:login and /groups/:login. */
-export type RepoOwner = 'user' | 'group';
+export type BookOwner = 'user' | 'group';
 
-function ownerReposPath(owner: RepoOwner, login: string): string {
+function ownerBooksPath(owner: BookOwner, login: string): string {
   return `/${owner === 'group' ? 'groups' : 'users'}/${encodeURIComponent(login)}/repos`;
 }
 
-export interface ListReposOptions {
+export interface ListBooksOptions {
   offset?: number;
   limit?: number;
   /** Spec enum: Book | Design. Omit for no server-side filter. */
@@ -18,27 +18,27 @@ export interface ListReposOptions {
   filterByAbility?: string;
 }
 
-export async function listRepos(
+export async function listBooks(
   http: YuqueHttp,
-  owner: RepoOwner,
+  owner: BookOwner,
   login: string,
-  options: ListReposOptions = {}
+  options: ListBooksOptions = {}
 ): Promise<V2Book[]> {
   const params: Record<string, unknown> = {};
   if (options.offset !== undefined) params.offset = options.offset;
   if (options.limit !== undefined) params.limit = options.limit;
   if (options.type !== undefined) params.type = options.type;
   if (options.filterByAbility !== undefined) params.filterByAbility = options.filterByAbility;
-  const res = await http.get<ApiEnvelope<V2Book[]>>(ownerReposPath(owner, login), params);
+  const res = await http.get<ApiEnvelope<V2Book[]>>(ownerBooksPath(owner, login), params);
   return res.data;
 }
 
-export async function getRepo(http: YuqueHttp, ref: RepoRef): Promise<V2BookDetail> {
-  const res = await http.get<ApiEnvelope<V2BookDetail>>(repoBasePath(ref));
+export async function getBook(http: YuqueHttp, ref: BookRef): Promise<V2BookDetail> {
+  const res = await http.get<ApiEnvelope<V2BookDetail>>(bookBasePath(ref));
   return res.data;
 }
 
-export interface CreateRepoBody {
+export interface CreateBookBody {
   name: string;
   slug: string;
   description?: string;
@@ -46,17 +46,17 @@ export interface CreateRepoBody {
   enhancedPrivacy?: boolean;
 }
 
-export async function createRepo(
+export async function createBook(
   http: YuqueHttp,
-  owner: RepoOwner,
+  owner: BookOwner,
   login: string,
-  body: CreateRepoBody
+  body: CreateBookBody
 ): Promise<V2Book> {
-  const res = await http.post<ApiEnvelope<V2Book>>(ownerReposPath(owner, login), body);
+  const res = await http.post<ApiEnvelope<V2Book>>(ownerBooksPath(owner, login), body);
   return res.data;
 }
 
-export interface UpdateRepoBody {
+export interface UpdateBookBody {
   name?: string;
   slug?: string;
   description?: string;
@@ -64,16 +64,16 @@ export interface UpdateRepoBody {
   toc?: string;
 }
 
-export async function updateRepo(
+export async function updateBook(
   http: YuqueHttp,
-  ref: RepoRef,
-  body: UpdateRepoBody
+  ref: BookRef,
+  body: UpdateBookBody
 ): Promise<V2Book> {
-  const res = await http.put<ApiEnvelope<V2Book>>(repoBasePath(ref), body);
+  const res = await http.put<ApiEnvelope<V2Book>>(bookBasePath(ref), body);
   return res.data;
 }
 
-export async function deleteRepo(http: YuqueHttp, ref: RepoRef): Promise<V2Book> {
-  const res = await http.delete<ApiEnvelope<V2Book>>(repoBasePath(ref));
+export async function deleteBook(http: YuqueHttp, ref: BookRef): Promise<V2Book> {
+  const res = await http.delete<ApiEnvelope<V2Book>>(bookBasePath(ref));
   return res.data;
 }
