@@ -4,7 +4,7 @@ import { getContext } from '../context.js';
 import { UsageError } from '../errors.js';
 import { confirmDestructive } from '../confirm.js';
 import { printJson, printOk, printRecord, printTable } from '../output.js';
-import { parseRepoRef } from '../client/repo-ref.js';
+import { parseBookRef } from '../client/book-ref.js';
 import { fetchAllPages } from '../client/paginate.js';
 import {
   createDoc,
@@ -20,7 +20,7 @@ import {
 } from '../client/api/doc.js';
 import type { V2DocDetail } from '../client/types.js';
 
-const REPO_ARG_HELP = 'repo id or group/slug namespace';
+const BOOK_ARG_HELP = 'book id or group/slug namespace';
 
 const DOC_META_FIELDS = [
   'id',
@@ -132,8 +132,8 @@ export function registerDocCommands(program: Command): void {
 
   const list = doc.command('list');
   list
-    .description('List the docs of a repo')
-    .argument('<repo>', REPO_ARG_HELP)
+    .description('List the docs of a book')
+    .argument('<book>', BOOK_ARG_HELP)
     .option('--offset <n>', 'pagination offset')
     .option('--limit <n>', 'page size (max 100)')
     .option('--all', 'fetch all pages (overrides --offset/--limit)')
@@ -156,7 +156,7 @@ export function registerDocCommands(program: Command): void {
         }
       ) => {
         const ctx = getContext(list);
-        const ref = parseRepoRef(repo);
+        const ref = parseBookRef(repo);
         // Validate unconditionally so `--all --limit banana` still exits 2;
         // with --all the paginator overrides these values.
         const offset = parseIntFlag(opts.offset, '--offset');
@@ -194,7 +194,7 @@ export function registerDocCommands(program: Command): void {
       const ctx = getContext(get);
       let detail: V2DocDetail;
       if (target.length === 2) {
-        detail = await getDoc(ctx.http, parseRepoRef(target[0]), target[1]);
+        detail = await getDoc(ctx.http, parseBookRef(target[0]), target[1]);
       } else if (target.length === 1) {
         if (!/^\d+$/.test(target[0])) {
           throw new UsageError(
@@ -219,7 +219,7 @@ export function registerDocCommands(program: Command): void {
   const create = doc.command('create');
   create
     .description('Create a doc in a repo')
-    .argument('<repo>', REPO_ARG_HELP)
+    .argument('<book>', BOOK_ARG_HELP)
     .requiredOption('--title <title>', 'doc title (required)')
     .option('--slug <slug>', 'doc slug (URL path)')
     .option('--body <content>', 'doc body content')
@@ -234,7 +234,7 @@ export function registerDocCommands(program: Command): void {
           'a doc body is required — pass --body <content> or --body-file <path>'
         );
       }
-      const created = await createDoc(ctx.http, parseRepoRef(repo), payload);
+      const created = await createDoc(ctx.http, parseBookRef(repo), payload);
       if (ctx.json) {
         printJson(created);
         return;
@@ -245,7 +245,7 @@ export function registerDocCommands(program: Command): void {
   const update = doc.command('update');
   update
     .description('Update a doc (only the given fields are changed)')
-    .argument('<repo>', REPO_ARG_HELP)
+    .argument('<book>', BOOK_ARG_HELP)
     .argument('<doc>', 'doc slug or id')
     .option('--title <title>', 'doc title')
     .option('--slug <slug>', 'doc slug (URL path)')
@@ -261,7 +261,7 @@ export function registerDocCommands(program: Command): void {
           'nothing to update — pass at least one of --title/--slug/--body/--body-file/--format/--public'
         );
       }
-      const updated = await updateDoc(ctx.http, parseRepoRef(repo), docRef, payload);
+      const updated = await updateDoc(ctx.http, parseBookRef(repo), docRef, payload);
       if (ctx.json) {
         printJson(updated);
         return;
@@ -272,13 +272,13 @@ export function registerDocCommands(program: Command): void {
   const del = doc.command('delete');
   del
     .description('Delete a doc')
-    .argument('<repo>', REPO_ARG_HELP)
+    .argument('<book>', BOOK_ARG_HELP)
     .argument('<doc>', 'doc slug or id')
     .option('--yes', 'skip the confirmation prompt')
     .action(async (repo: string, docRef: string, opts: { yes?: boolean }) => {
       await confirmDestructive(`delete doc ${repo}/${docRef}`, Boolean(opts.yes));
       const ctx = getContext(del);
-      const deleted = await deleteDoc(ctx.http, parseRepoRef(repo), docRef);
+      const deleted = await deleteDoc(ctx.http, parseBookRef(repo), docRef);
       if (ctx.json) {
         printJson(deleted);
         return;

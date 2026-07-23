@@ -2,7 +2,7 @@ import { Command, InvalidArgumentError, Option } from 'commander';
 import { getContext } from '../context.js';
 import { UsageError } from '../errors.js';
 import { dim, printJson, printOk } from '../output.js';
-import { parseRepoRef } from '../client/repo-ref.js';
+import { parseBookRef } from '../client/book-ref.js';
 import { getToc, updateToc, type TocUpdateBody } from '../client/api/toc.js';
 import type { V2TocItem } from '../client/types.js';
 
@@ -90,15 +90,15 @@ function validateTocUpdate(opts: TocUpdateOptions): void {
 }
 
 export function registerTocCommands(program: Command): void {
-  const toc = program.command('toc').description('Manage the table of contents (目录) of a repo');
+  const toc = program.command('toc').description('Manage the table of contents (目录) of a book');
 
   const get = toc
     .command('get')
-    .description('Show the toc of a repo as an indented tree')
-    .argument('<repo>', 'repo id or group/slug namespace')
-    .action(async (repoArg: string) => {
+    .description('Show the toc of a book as an indented tree')
+    .argument('<book>', 'book id or group/slug namespace')
+    .action(async (bookArg: string) => {
       const ctx = getContext(get);
-      const items = await getToc(ctx.http, parseRepoRef(repoArg));
+      const items = await getToc(ctx.http, parseBookRef(bookArg));
       if (ctx.json) {
         printJson(items);
         return;
@@ -108,8 +108,8 @@ export function registerTocCommands(program: Command): void {
 
   const update = toc
     .command('update')
-    .description('Update the toc of a repo (append/prepend/edit/remove nodes)')
-    .argument('<repo>', 'repo id or group/slug namespace')
+    .description('Update the toc of a book (append/prepend/edit/remove nodes)')
+    .argument('<book>', 'book id or group/slug namespace')
     .addOption(
       new Option(
         '--action <action>',
@@ -147,7 +147,7 @@ export function registerTocCommands(program: Command): void {
     .addOption(
       new Option('--visible <n>', 'node visibility (0: hidden, 1: visible)').choices(['0', '1'])
     )
-    .action(async (repoArg: string) => {
+    .action(async (bookArg: string) => {
       const opts = update.opts<TocUpdateOptions>();
       validateTocUpdate(opts);
       const ctx = getContext(update);
@@ -164,7 +164,7 @@ export function registerTocCommands(program: Command): void {
         ...(opts.openWindow !== undefined && { open_window: Number(opts.openWindow) }),
         ...(opts.visible !== undefined && { visible: Number(opts.visible) }),
       };
-      const items = await updateToc(ctx.http, parseRepoRef(repoArg), body);
+      const items = await updateToc(ctx.http, parseBookRef(bookArg), body);
       if (ctx.json) {
         printJson(items);
         return;

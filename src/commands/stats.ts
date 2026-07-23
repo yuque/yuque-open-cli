@@ -236,7 +236,7 @@ export function registerStatsCommands(program: Command): void {
     stats.command('docs <login>').description('Per-doc statistics for a group'),
     DOC_SORT_FIELDS
   )
-    .option('--book-id <id>', 'only docs in this book (repo id)', parsePositiveInt('--book-id'))
+    .option('--book-id <id>', 'only docs in this book (book id)', parsePositiveInt('--book-id'))
     .action(async (login: string) => {
       await runList(
         docsCmd,

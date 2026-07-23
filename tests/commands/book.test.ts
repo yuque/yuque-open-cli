@@ -38,7 +38,7 @@ const BOOK = {
   _extra: 'kept in --json output',
 };
 
-describe('repo commands', () => {
+describe('book commands', () => {
   const request = vi.fn();
   let stdoutChunks: string[] = [];
   let stderrChunks: string[] = [];
@@ -67,10 +67,10 @@ describe('repo commands', () => {
     vi.restoreAllMocks();
   });
 
-  describe('repo list', () => {
+  describe('book list', () => {
     it('lists user repos and prints a table', async () => {
       request.mockResolvedValueOnce(envelope([BOOK]));
-      await expect(runCli(argv('repo', 'list', 'yuque'))).resolves.toBe(0);
+      await expect(runCli(argv('book', 'list', 'yuque'))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
         method: 'get',
         url: '/users/yuque/repos',
@@ -84,7 +84,7 @@ describe('repo commands', () => {
 
     it('lists group repos with filter and pagination params', async () => {
       request.mockResolvedValueOnce(envelope([]));
-      const args = ['repo', 'list', 'mygroup', '--group'];
+      const args = ['book', 'list', 'mygroup', '--group'];
       args.push('--type', 'Book', '--offset', '10', '--limit', '20');
       await expect(runCli(argv(...args))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
@@ -97,7 +97,7 @@ describe('repo commands', () => {
 
     it('treats --type all as no server-side filter', async () => {
       request.mockResolvedValueOnce(envelope([]));
-      await expect(runCli(argv('repo', 'list', 'yuque', '--type', 'all'))).resolves.toBe(0);
+      await expect(runCli(argv('book', 'list', 'yuque', '--type', 'all'))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith(expect.objectContaining({ params: {} }));
     });
 
@@ -108,7 +108,7 @@ describe('repo commands', () => {
         namespace: `yuque/r${i}`,
       }));
       request.mockResolvedValueOnce(envelope(fullPage)).mockResolvedValueOnce(envelope([BOOK]));
-      await expect(runCli(argv('repo', 'list', 'yuque', '--all', '--json'))).resolves.toBe(0);
+      await expect(runCli(argv('book', 'list', 'yuque', '--all', '--json'))).resolves.toBe(0);
       expect(request).toHaveBeenNthCalledWith(
         1,
         expect.objectContaining({ url: '/users/yuque/repos', params: { offset: 0, limit: 100 } })
@@ -121,21 +121,21 @@ describe('repo commands', () => {
     });
 
     it('rejects an unknown --type', async () => {
-      await expect(runCli(argv('repo', 'list', 'yuque', '--type', 'Wiki'))).resolves.toBe(2);
+      await expect(runCli(argv('book', 'list', 'yuque', '--type', 'Wiki'))).resolves.toBe(2);
       expect(request).not.toHaveBeenCalled();
       expect(stderrText()).toContain('--type');
     });
 
     it('rejects a non-numeric --offset', async () => {
-      await expect(runCli(argv('repo', 'list', 'yuque', '--offset', 'abc'))).resolves.toBe(2);
+      await expect(runCli(argv('book', 'list', 'yuque', '--offset', 'abc'))).resolves.toBe(2);
       expect(request).not.toHaveBeenCalled();
     });
   });
 
-  describe('repo get', () => {
+  describe('book get', () => {
     it('gets a repo by id and prints the full payload with --json', async () => {
       request.mockResolvedValueOnce(envelope(BOOK));
-      await expect(runCli(argv('repo', 'get', '42', '--json'))).resolves.toBe(0);
+      await expect(runCli(argv('book', 'get', '42', '--json'))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
         method: 'get',
         url: '/repos/42',
@@ -147,22 +147,22 @@ describe('repo commands', () => {
 
     it('gets a repo by namespace and prints a record', async () => {
       request.mockResolvedValueOnce(envelope(BOOK));
-      await expect(runCli(argv('repo', 'get', 'yuque/help'))).resolves.toBe(0);
+      await expect(runCli(argv('book', 'get', 'yuque/help'))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith(expect.objectContaining({ url: '/repos/yuque/help' }));
       expect(stdoutText()).toContain('帮助中心');
       expect(stdoutText()).not.toContain('_extra');
     });
 
     it('rejects a malformed repo reference', async () => {
-      await expect(runCli(argv('repo', 'get', 'not-a-ref'))).resolves.toBe(2);
+      await expect(runCli(argv('book', 'get', 'not-a-ref'))).resolves.toBe(2);
       expect(request).not.toHaveBeenCalled();
     });
   });
 
-  describe('repo create', () => {
-    it('creates a user repo with name and slug', async () => {
+  describe('book create', () => {
+    it('creates a user book with name and slug', async () => {
       request.mockResolvedValueOnce(envelope(BOOK));
-      const args = ['repo', 'create', 'yuque', '--name', '帮助中心', '--slug', 'help'];
+      const args = ['book', 'create', 'yuque', '--name', '帮助中心', '--slug', 'help'];
       await expect(runCli(argv(...args))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
         method: 'post',
@@ -170,12 +170,12 @@ describe('repo commands', () => {
         params: undefined,
         data: { name: '帮助中心', slug: 'help' },
       });
-      expect(stdoutText()).toContain('Created repo yuque/help');
+      expect(stdoutText()).toContain('Created book yuque/help');
     });
 
-    it('creates a group repo with all optional fields', async () => {
+    it('creates a group book with all optional fields', async () => {
       request.mockResolvedValueOnce(envelope(BOOK));
-      const args = ['repo', 'create', 'mygroup', '--group', '--name', 'Docs', '--slug', 'docs'];
+      const args = ['book', 'create', 'mygroup', '--group', '--name', 'Docs', '--slug', 'docs'];
       args.push('--description', 'd', '--public', '2', '--enhanced-privacy', '--json');
       await expect(runCli(argv(...args))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
@@ -188,14 +188,14 @@ describe('repo commands', () => {
     });
 
     it('rejects a --limit above the spec cap on repo list', async () => {
-      const args = ['repo', 'list', 'yuque', '--limit', '101'];
+      const args = ['book', 'list', 'yuque', '--limit', '101'];
       await expect(runCli(argv(...args))).resolves.toBe(2);
       expect(request).not.toHaveBeenCalled();
     });
 
     it('passes --filter-by-ability through to the query', async () => {
       request.mockResolvedValueOnce(envelope([BOOK]));
-      const args = ['repo', 'list', 'yuque', '--filter-by-ability', 'create_doc', '--json'];
+      const args = ['book', 'list', 'yuque', '--filter-by-ability', 'create_doc', '--json'];
       await expect(runCli(argv(...args))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
         method: 'get',
@@ -206,10 +206,10 @@ describe('repo commands', () => {
     });
   });
 
-  describe('repo update', () => {
+  describe('book update', () => {
     it('sends only the provided fields', async () => {
       request.mockResolvedValueOnce(envelope(BOOK));
-      const args = ['repo', 'update', '42', '--name', 'New name', '--public', '0'];
+      const args = ['book', 'update', '42', '--name', 'New name', '--public', '0'];
       await expect(runCli(argv(...args))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
         method: 'put',
@@ -217,34 +217,34 @@ describe('repo commands', () => {
         params: undefined,
         data: { name: 'New name', public: 0 },
       });
-      expect(stdoutText()).toContain('Updated repo yuque/help');
+      expect(stdoutText()).toContain('Updated book yuque/help');
     });
 
     it('rejects an update with no fields', async () => {
-      await expect(runCli(argv('repo', 'update', '42'))).resolves.toBe(2);
+      await expect(runCli(argv('book', 'update', '42'))).resolves.toBe(2);
       expect(request).not.toHaveBeenCalled();
       expect(stderrText()).toContain('Nothing to update');
     });
   });
 
-  describe('repo delete', () => {
+  describe('book delete', () => {
     it('deletes with --yes without prompting', async () => {
       request.mockResolvedValueOnce(envelope(BOOK));
-      await expect(runCli(argv('repo', 'delete', 'yuque/help', '--yes'))).resolves.toBe(0);
+      await expect(runCli(argv('book', 'delete', 'yuque/help', '--yes'))).resolves.toBe(0);
       expect(request).toHaveBeenCalledWith({
         method: 'delete',
         url: '/repos/yuque/help',
         params: undefined,
         data: undefined,
       });
-      expect(stdoutText()).toContain('Deleted repo yuque/help');
+      expect(stdoutText()).toContain('Deleted book yuque/help');
     });
 
     it('refuses without --yes when stdin is not a TTY', async () => {
       const originalIsTTY = process.stdin.isTTY;
       process.stdin.isTTY = false;
       try {
-        await expect(runCli(argv('repo', 'delete', 'yuque/help'))).resolves.toBe(2);
+        await expect(runCli(argv('book', 'delete', 'yuque/help'))).resolves.toBe(2);
       } finally {
         process.stdin.isTTY = originalIsTTY;
       }

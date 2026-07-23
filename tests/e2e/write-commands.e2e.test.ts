@@ -17,14 +17,14 @@ afterEach(async () => {
   await server.stop();
 });
 
-describe('repo writes', () => {
-  it('repo create posts the spec body fields', async () => {
+describe('book writes', () => {
+  it('book create posts the spec body fields', async () => {
     server.route('POST', '/api/v2/users/me/repos', {
       body: { data: { id: 1, slug: 'notes', namespace: 'me/notes', name: '笔记' } },
     });
     const result = await runYuque(
       [
-        'repo',
+        'book',
         'create',
         'me',
         '--name',
@@ -38,7 +38,7 @@ describe('repo writes', () => {
       { host }
     );
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain('Created repo me/notes');
+    expect(result.stdout).toContain('Created book me/notes');
     expect(server.requests[0].body).toEqual({
       name: '笔记',
       slug: 'notes',
@@ -47,9 +47,9 @@ describe('repo writes', () => {
     });
   });
 
-  it('repo create rejects an out-of-enum --public locally (exit 2, no request)', async () => {
+  it('book create rejects an out-of-enum --public locally (exit 2, no request)', async () => {
     const result = await runYuque(
-      ['repo', 'create', 'me', '--name', 'n', '--slug', 's', '--public', '3'],
+      ['book', 'create', 'me', '--name', 'n', '--slug', 's', '--public', '3'],
       {
         host,
       }
@@ -59,17 +59,17 @@ describe('repo writes', () => {
     expect(server.requests).toHaveLength(0);
   });
 
-  it('repo delete requires --yes when stdin is not a TTY', async () => {
-    const refused = await runYuque(['repo', 'delete', '42'], { host });
+  it('book delete requires --yes when stdin is not a TTY', async () => {
+    const refused = await runYuque(['book', 'delete', '42'], { host });
     expect(refused.code).toBe(2);
     expect(server.requests).toHaveLength(0);
 
     server.route('DELETE', '/api/v2/repos/42', {
       body: { data: { id: 42, slug: 'gone', namespace: 'me/gone' } },
     });
-    const deleted = await runYuque(['repo', 'delete', '42', '--yes'], { host });
+    const deleted = await runYuque(['book', 'delete', '42', '--yes'], { host });
     expect(deleted.code).toBe(0);
-    expect(deleted.stdout).toContain('Deleted repo me/gone');
+    expect(deleted.stdout).toContain('Deleted book me/gone');
   });
 });
 

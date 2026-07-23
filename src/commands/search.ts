@@ -4,7 +4,9 @@ import { UsageError } from '../errors.js';
 import { printJson, printTable } from '../output.js';
 import { search } from '../client/api/search.js';
 
-const SEARCH_TYPES = ['doc', 'repo'];
+// CLI surface says `book` (知识库); the wire enum is doc|repo, and `repo` stays
+// accepted as a compatibility alias mapped to the same wire value.
+const SEARCH_TYPES = ['doc', 'book', 'repo'];
 
 // Commander-level validation (makeOptionMandatory/choices/argParser errors) exits
 // via process.exit on subcommands, bypassing runCli's exit-code contract — so
@@ -22,22 +24,22 @@ function pageFlag(value: string): number {
 export function registerSearchCommands(program: Command): void {
   const cmd = program
     .command('search')
-    .description('Search docs or repos')
+    .description('Search docs or books')
     .argument('<query>', 'search keywords')
-    .option('--type <type>', 'what to search for: doc or repo (required)')
+    .option('--type <type>', 'what to search for: doc or book (required)')
     .option('--scope <ns>', 'restrict to a group or group/repo namespace')
     .option('--creator <login>', 'only results created by this user')
     .option('--page <n>', 'page number (page size is fixed at 20)', pageFlag);
   cmd.action(async (query: string) => {
     const opts = cmd.opts<{ type?: string; scope?: string; creator?: string; page?: number }>();
-    if (!opts.type) throw new UsageError('--type <doc|repo> is required');
+    if (!opts.type) throw new UsageError('--type <doc|book> is required');
     if (!SEARCH_TYPES.includes(opts.type)) {
-      throw new UsageError(`invalid --type "${opts.type}" — expected doc or repo`);
+      throw new UsageError(`invalid --type "${opts.type}" — expected doc or book`);
     }
     const ctx = getContext(cmd);
     const results = await search(ctx.http, {
       q: query,
-      type: opts.type as 'doc' | 'repo',
+      type: opts.type === 'book' ? 'repo' : (opts.type as 'doc' | 'repo'),
       scope: opts.scope,
       creator: opts.creator,
       page: opts.page,

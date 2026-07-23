@@ -226,7 +226,7 @@ describe('auth / user / search commands', () => {
 
     it('prints the full result list with --json', async () => {
       request.mockResolvedValueOnce({ data: { data: results } });
-      const code = await runCli(['node', 'yuque', 'search', 'guide', '--type', 'repo', '--json']);
+      const code = await runCli(['node', 'yuque', 'search', 'guide', '--type', 'book', '--json']);
       expect(code).toBe(0);
       expect(request).toHaveBeenCalledWith(
         expect.objectContaining({ params: { q: 'guide', type: 'repo' } })

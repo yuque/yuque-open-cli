@@ -6,7 +6,7 @@ import type {
   V2DocVersion,
   V2DocVersionDetail,
 } from '../types.js';
-import { repoBasePath, type RepoRef } from '../repo-ref.js';
+import { bookBasePath, type BookRef } from '../book-ref.js';
 
 /** Query parameters of GET {repo}/docs, mirroring the spec. */
 export interface DocListParams {
@@ -30,16 +30,16 @@ export interface DocWritePayload {
 
 export async function listDocs(
   http: YuqueHttp,
-  repo: RepoRef,
+  repo: BookRef,
   params: DocListParams = {}
 ): Promise<V2Doc[]> {
-  const res = await http.get<ApiEnvelope<V2Doc[]>>(`${repoBasePath(repo)}/docs`, params);
+  const res = await http.get<ApiEnvelope<V2Doc[]>>(`${bookBasePath(repo)}/docs`, params);
   return res.data;
 }
 
-export async function getDoc(http: YuqueHttp, repo: RepoRef, doc: string): Promise<V2DocDetail> {
+export async function getDoc(http: YuqueHttp, repo: BookRef, doc: string): Promise<V2DocDetail> {
   const res = await http.get<ApiEnvelope<V2DocDetail>>(
-    `${repoBasePath(repo)}/docs/${encodeURIComponent(doc)}`
+    `${bookBasePath(repo)}/docs/${encodeURIComponent(doc)}`
   );
   return res.data;
 }
@@ -52,29 +52,29 @@ export async function getDocById(http: YuqueHttp, id: number): Promise<V2DocDeta
 
 export async function createDoc(
   http: YuqueHttp,
-  repo: RepoRef,
+  repo: BookRef,
   payload: DocWritePayload
 ): Promise<V2DocDetail> {
-  const res = await http.post<ApiEnvelope<V2DocDetail>>(`${repoBasePath(repo)}/docs`, payload);
+  const res = await http.post<ApiEnvelope<V2DocDetail>>(`${bookBasePath(repo)}/docs`, payload);
   return res.data;
 }
 
 export async function updateDoc(
   http: YuqueHttp,
-  repo: RepoRef,
+  repo: BookRef,
   doc: string,
   payload: DocWritePayload
 ): Promise<V2DocDetail> {
   const res = await http.put<ApiEnvelope<V2DocDetail>>(
-    `${repoBasePath(repo)}/docs/${encodeURIComponent(doc)}`,
+    `${bookBasePath(repo)}/docs/${encodeURIComponent(doc)}`,
     payload
   );
   return res.data;
 }
 
-export async function deleteDoc(http: YuqueHttp, repo: RepoRef, doc: string): Promise<V2DocDetail> {
+export async function deleteDoc(http: YuqueHttp, repo: BookRef, doc: string): Promise<V2DocDetail> {
   const res = await http.delete<ApiEnvelope<V2DocDetail>>(
-    `${repoBasePath(repo)}/docs/${encodeURIComponent(doc)}`
+    `${bookBasePath(repo)}/docs/${encodeURIComponent(doc)}`
   );
   return res.data;
 }

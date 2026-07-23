@@ -18,7 +18,7 @@
 yuque search "灰度发布" --type doc                 # 找回那篇只记得大概的文档
 yuque doc get team/handbook onboarding > onboarding.md
 yuque doc create team/notes --title "周会纪要" --body-file weekly.md
-yuque repo list my-team --group --all --json | jq '.[].name'
+yuque book list my-team --group --all --json | jq '.[].name'
 ```
 
 ## 快速开始
@@ -42,7 +42,7 @@ YUQUE_TOKEN=YOUR_TOKEN npx yuque-open-cli auth status
 
 </details>
 
-**第三步：开始探索** —— 先 `yuque repo list your-login`，再 `yuque doc list <repo>`。
+**第三步：开始探索** —— 先 `yuque book list your-login`，再 `yuque doc list <book>`。
 
 ## 配置
 
@@ -65,20 +65,20 @@ YUQUE_TOKEN=YOUR_TOKEN npx yuque-open-cli auth status
 | **用户**   | `user info`                          | 查看当前 Token 对应的用户                                          |
 |            | `user groups <user>`                 | 列出用户加入的团队                                                 |
 | **搜索**   | `search <query>`                     | 搜索文档或知识库，支持分页                                         |
-| **知识库** | `repo list <login>`                  | 列出用户或团队（`--group`）的知识库                                |
-|            | `repo get <repo>`                    | 按 id 或 `owner/slug` 查看知识库                                   |
-|            | `repo create <login>`                | 创建知识库                                                         |
-|            | `repo update <repo>`                 | 更新名称、路径、简介、可见性或目录                                 |
-|            | `repo delete <repo>`                 | 删除知识库 —— 需要确认                                             |
-| **文档**   | `doc list <repo>`                    | 列出知识库中的文档，`--all` 拉取全量                               |
-|            | `doc get <repo> <doc>`               | 输出文档 markdown 正文；也接受全局 `<doc-id>`，`--meta` 查看元信息 |
-|            | `doc create <repo>`                  | 从 `--body` 或 `--body-file` 创建文档                              |
-|            | `doc update <repo> <doc>`            | 更新文档正文或元信息                                               |
-|            | `doc delete <repo> <doc>`            | 删除文档 —— 需要确认                                               |
+| **知识库** | `book list <login>`                  | 列出用户或团队（`--group`）的知识库                                |
+|            | `book get <book>`                    | 按 id 或 `owner/slug` 查看知识库                                   |
+|            | `book create <login>`                | 创建知识库                                                         |
+|            | `book update <book>`                 | 更新名称、路径、简介、可见性或目录                                 |
+|            | `book delete <book>`                 | 删除知识库 —— 需要确认                                             |
+| **文档**   | `doc list <book>`                    | 列出知识库中的文档，`--all` 拉取全量                               |
+|            | `doc get <book> <doc>`               | 输出文档 markdown 正文；也接受全局 `<doc-id>`，`--meta` 查看元信息 |
+|            | `doc create <book>`                  | 从 `--body` 或 `--body-file` 创建文档                              |
+|            | `doc update <book> <doc>`            | 更新文档正文或元信息                                               |
+|            | `doc delete <book> <doc>`            | 删除文档 —— 需要确认                                               |
 |            | `doc versions <doc-id>`              | 列出文档的版本历史                                                 |
 |            | `doc version <version-id>`           | 查看某个版本的内容                                                 |
-| **目录**   | `toc get <repo>`                     | 以树形输出知识库目录                                               |
-|            | `toc update <repo>`                  | 追加、头插、编辑或删除目录节点                                     |
+| **目录**   | `toc get <book>`                     | 以树形输出知识库目录                                               |
+|            | `toc update <book>`                  | 追加、头插、编辑或删除目录节点                                     |
 | **团队**   | `group members <login>`              | 列出团队成员                                                       |
 |            | `group member set <login> <user>`    | 添加成员或调整角色                                                 |
 |            | `group member remove <login> <user>` | 移除成员 —— 需要确认                                               |

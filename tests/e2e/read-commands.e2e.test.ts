@@ -59,7 +59,7 @@ describe('auth & user', () => {
   });
 });
 
-describe('search & repo', () => {
+describe('search & book', () => {
   it('search sends q/type and renders a table', async () => {
     server.route('GET', '/api/v2/search', {
       body: { data: [{ id: 1, type: 'doc', title: '灰度发布', url: '/x/y' }] },
@@ -70,7 +70,7 @@ describe('search & repo', () => {
     expect(server.requests[0].query).toEqual({ q: '灰度发布', type: 'doc' });
   });
 
-  it('repo list --group --all drains pages and prints a JSON array', async () => {
+  it('book list --group --all drains pages and prints a JSON array', async () => {
     const fullPage = Array.from({ length: 100 }, (_, i) => ({
       id: i,
       slug: `r${i}`,
@@ -81,7 +81,7 @@ describe('search & repo', () => {
         ? { body: { data: fullPage } }
         : { body: { data: [{ id: 100, slug: 'last', name: 'Last' }] } }
     );
-    const result = await runYuque(['repo', 'list', 'eng', '--group', '--all', '--json'], { host });
+    const result = await runYuque(['book', 'list', 'eng', '--group', '--all', '--json'], { host });
     expect(result.code).toBe(0);
     expect(JSON.parse(result.stdout)).toHaveLength(101);
     const offsets = server
@@ -90,11 +90,11 @@ describe('search & repo', () => {
     expect(offsets).toEqual(['0', '100']);
   });
 
-  it('repo get resolves an owner/slug namespace to the namespace path', async () => {
+  it('book get resolves an owner/slug namespace to the namespace path', async () => {
     server.route('GET', '/api/v2/repos/yuque/help', {
       body: { data: { id: 42, name: '帮助中心', namespace: 'yuque/help', slug: 'help' } },
     });
-    const result = await runYuque(['repo', 'get', 'yuque/help'], { host });
+    const result = await runYuque(['book', 'get', 'yuque/help'], { host });
     expect(result.code).toBe(0);
     expect(result.stdout).toContain('帮助中心');
   });

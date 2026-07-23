@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.0
+
+Breaking: knowledge bases are now `book` across the CLI surface, aligning with
+Yuque's own terminology (知识库 = book, matching the API's `V2Book`/`book_id`):
+
+- `repo list/get/create/update/delete` → `book list/get/create/update/delete`;
+  `<repo>` arguments are now `<book>`.
+- `search --type` takes `doc|book` (`repo` still accepted as a compatibility
+  alias; the wire value is unchanged).
+- Help text and READMEs updated accordingly. HTTP paths (`/repos/...`) and env
+  variables (`YUQUE_E2E_REPO`) are unchanged.
+
 ## 1.0.0
 
 Initial release of `yuque-open-cli` — a spec-driven, scriptable command-line
