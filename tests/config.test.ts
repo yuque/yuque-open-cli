@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_HOST, normalizeHost, resolveHost, resolveToken } from '../src/config.js';
+import {
+  DEFAULT_HOST,
+  MISSING_TOKEN_MESSAGE,
+  normalizeHost,
+  resolveHost,
+  resolveToken,
+} from '../src/config.js';
 
 describe('resolveToken', () => {
   it('prefers the flag over env vars', () => {
@@ -13,6 +19,18 @@ describe('resolveToken', () => {
 
   it('returns undefined when nothing is set', () => {
     expect(resolveToken(undefined, {})).toBeUndefined();
+  });
+});
+
+describe('MISSING_TOKEN_MESSAGE', () => {
+  it('documents every way resolveToken accepts a token', () => {
+    expect(MISSING_TOKEN_MESSAGE).toContain('YUQUE_TOKEN');
+    expect(MISSING_TOKEN_MESSAGE).toContain('YUQUE_PERSONAL_TOKEN');
+    expect(MISSING_TOKEN_MESSAGE).toContain('--token');
+  });
+
+  it('keeps the prefix the README troubleshooting table keys on', () => {
+    expect(MISSING_TOKEN_MESSAGE.startsWith('A Yuque API token is required')).toBe(true);
   });
 });
 

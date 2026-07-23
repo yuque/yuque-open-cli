@@ -20,12 +20,27 @@ export function printOk(message: string): void {
   process.stdout.write(`${colorEnabled() ? '\x1b[32m✓\x1b[0m' : '✓'} ${message}\n`);
 }
 
-/** Display width where CJK characters count as 2 columns, for aligned tables. */
+/** EastAsianWidth Wide/Fullwidth ranges (plus emoji) that occupy 2 terminal columns. */
+const WIDE_RANGES: ReadonlyArray<readonly [number, number]> = [
+  [0x1100, 0x115f], // Hangul Jamo
+  [0x2e80, 0xa4cf], // CJK Radicals .. Yi
+  [0xa960, 0xa97f], // Hangul Jamo Extended-A
+  [0xac00, 0xd7a3], // Hangul syllables
+  [0xf900, 0xfaff], // CJK Compatibility Ideographs
+  [0xfe10, 0xfe19], // Vertical forms
+  [0xfe30, 0xfe6f], // CJK Compatibility Forms, Small Form Variants
+  [0xff00, 0xff60], // Fullwidth forms (excludes halfwidth katakana)
+  [0xffe0, 0xffe6], // Fullwidth signs
+  [0x1f300, 0x1faff], // Emoji
+  [0x20000, 0x3fffd], // CJK Extension B+
+];
+
+/** Display width where wide characters (CJK, Hangul, emoji, ...) count as 2 columns. */
 export function displayWidth(text: string): number {
   let width = 0;
   for (const char of text) {
     const code = char.codePointAt(0) ?? 0;
-    width += code >= 0x2e80 && code <= 0x9fff ? 2 : code >= 0xff00 && code <= 0xffef ? 2 : 1;
+    width += WIDE_RANGES.some(([lo, hi]) => code >= lo && code <= hi) ? 2 : 1;
   }
   return width;
 }

@@ -83,7 +83,8 @@ export function registerTocCommands(program: Command): void {
     .addOption(
       new Option(
         '--action <action>',
-        'operation: appendNode (append), prependNode (prepend), editNode, removeNode'
+        'operation: appendNode (append), prependNode (prepend), editNode, removeNode (required); ' +
+          'move a node: appendNode/prependNode + --node-uuid'
       )
         .choices(['appendNode', 'prependNode', 'editNode', 'removeNode'])
         .makeOptionMandatory()

@@ -1,7 +1,7 @@
 export const DEFAULT_HOST = 'https://www.yuque.com';
 
 export const MISSING_TOKEN_MESSAGE =
-  'A Yuque API token is required. Set the YUQUE_TOKEN environment variable or pass --token=<token>. ' +
+  'A Yuque API token is required. Set the YUQUE_TOKEN (or YUQUE_PERSONAL_TOKEN) environment variable or pass --token=<token>. ' +
   'Create one at https://www.yuque.com/settings/tokens';
 
 /** Flag wins over env so scripted one-off overrides behave like gh/glab. */

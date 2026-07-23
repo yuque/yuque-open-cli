@@ -85,6 +85,9 @@ describe('doc commands', () => {
             '10',
             '--limit',
             '5',
+            '--deleted',
+            '--changed-at-gte',
+            '2026-01-01T00:00:00.000Z',
             '--optional-properties',
             'hits,tags'
           )
@@ -93,7 +96,13 @@ describe('doc commands', () => {
       expect(request).toHaveBeenCalledWith({
         method: 'get',
         url: '/repos/123456/docs',
-        params: { offset: 10, limit: 5, optional_properties: 'hits,tags' },
+        params: {
+          offset: 10,
+          limit: 5,
+          deleted: true,
+          changed_at_gte: '2026-01-01T00:00:00.000Z',
+          optional_properties: 'hits,tags',
+        },
         data: undefined,
       });
     });
@@ -128,6 +137,25 @@ describe('doc commands', () => {
     it('rejects a non-integer --limit with exit code 2', async () => {
       await expect(runCli(argv('doc', 'list', 'yuque/help', '--limit', 'ten'))).resolves.toBe(2);
       expect(request).not.toHaveBeenCalled();
+    });
+
+    it('rejects a non-integer --limit with exit code 2 even with --all', async () => {
+      await expect(
+        runCli(argv('doc', 'list', 'yuque/help', '--all', '--limit', 'banana'))
+      ).resolves.toBe(2);
+      expect(request).not.toHaveBeenCalled();
+      expect(stderrText()).toContain('--limit expects a non-negative integer');
+    });
+
+    it('--all overrides valid --offset/--limit values with the paginator schedule', async () => {
+      request.mockResolvedValueOnce(ok([{ id: 1 }]));
+      await expect(
+        runCli(argv('doc', 'list', 'yuque/help', '--all', '--offset', '10', '--limit', '5'))
+      ).resolves.toBe(0);
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(request).toHaveBeenCalledWith(
+        expect.objectContaining({ params: { offset: 0, limit: 100 } })
+      );
     });
   });
 

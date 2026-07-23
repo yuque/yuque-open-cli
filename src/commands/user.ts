@@ -56,7 +56,7 @@ export function registerUserCommands(program: Command): void {
     .argument('<user>', 'user login or numeric id')
     .option('--role <n>', 'filter by role (0: admin, 1: member)', roleFlag)
     .option('--offset <n>', 'pagination offset (page size is fixed at 100)', intFlag('--offset'))
-    .option('--all', 'fetch all pages');
+    .option('--all', 'fetch all pages (overrides --offset)');
   groups.action(async (userRef: string) => {
     const ctx = getContext(groups);
     const opts = groups.opts<{ role?: number; offset?: number; all?: boolean }>();

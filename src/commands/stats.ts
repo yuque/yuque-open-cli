@@ -142,12 +142,11 @@ function withListOptions(cmd: Command, sortFields: string[]): Command {
     .option('--all', 'fetch every page (takes precedence over --page/--limit)');
 }
 
+// --json always prints the bare rows array (with or without --all) so scripts can
+// rely on the same `.[]` shape as every other list command.
 async function runList<T extends Record<string, unknown>>(
   cmd: Command,
-  fetchPage: (
-    http: YuqueHttp,
-    params: DocStatsListParams
-  ) => Promise<{ rows: T[]; payload: unknown }>,
+  fetchPage: (http: YuqueHttp, params: DocStatsListParams) => Promise<T[]>,
   columns: Column<T>[]
 ): Promise<void> {
   const ctx = getContext(cmd);
@@ -159,25 +158,14 @@ async function runList<T extends Record<string, unknown>>(
     sortOrder: opts.sortOrder,
     bookId: opts.bookId,
   };
-  if (opts.all) {
-    const rows = await fetchAllPages<T>(async (offset, limit) => {
-      const page = await fetchPage(ctx.http, { ...filters, page: offset / limit + 1, limit });
-      return page.rows;
-    }, MAX_PAGE_SIZE);
-    if (ctx.json) {
-      printJson(rows);
-    } else {
-      printTable(rows, columns);
-    }
-    return;
-  }
-  const { rows, payload } = await fetchPage(ctx.http, {
-    ...filters,
-    page: opts.page,
-    limit: opts.limit,
-  });
+  const rows = opts.all
+    ? await fetchAllPages<T>(
+        (offset, limit) => fetchPage(ctx.http, { ...filters, page: offset / limit + 1, limit }),
+        MAX_PAGE_SIZE
+      )
+    : await fetchPage(ctx.http, { ...filters, page: opts.page, limit: opts.limit });
   if (ctx.json) {
-    printJson(payload);
+    printJson(rows);
   } else {
     printTable(rows, columns);
   }
@@ -205,10 +193,7 @@ export function registerStatsCommands(program: Command): void {
   ).action(async (login: string) => {
     await runList(
       membersCmd,
-      async (http, params) => {
-        const page = await listMemberStatistics(http, login, params);
-        return { rows: page.members, payload: page };
-      },
+      async (http, params) => (await listMemberStatistics(http, login, params)).members,
       MEMBER_COLUMNS
     );
   });
@@ -219,10 +204,7 @@ export function registerStatsCommands(program: Command): void {
   ).action(async (login: string) => {
     await runList(
       booksCmd,
-      async (http, params) => {
-        const page = await listBookStatistics(http, login, params);
-        return { rows: page.books, payload: page };
-      },
+      async (http, params) => (await listBookStatistics(http, login, params)).books,
       BOOK_COLUMNS
     );
   });
@@ -235,10 +217,7 @@ export function registerStatsCommands(program: Command): void {
     .action(async (login: string) => {
       await runList(
         docsCmd,
-        async (http, params) => {
-          const page = await listDocStatistics(http, login, params);
-          return { rows: page.docs, payload: page };
-        },
+        async (http, params) => (await listDocStatistics(http, login, params)).docs,
         DOC_COLUMNS
       );
     });

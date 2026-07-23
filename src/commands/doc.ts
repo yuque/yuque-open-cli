@@ -114,7 +114,7 @@ export function registerDocCommands(program: Command): void {
     .argument('<repo>', REPO_ARG_HELP)
     .option('--offset <n>', 'pagination offset')
     .option('--limit <n>', 'page size (max 100)')
-    .option('--all', 'fetch all pages')
+    .option('--all', 'fetch all pages (overrides --offset/--limit)')
     .option('--deleted', 'list deleted docs')
     .option('--changed-at-gte <datetime>', 'only docs changed at or after this ISO 8601 time')
     .option(
@@ -135,6 +135,10 @@ export function registerDocCommands(program: Command): void {
       ) => {
         const ctx = getContext(list);
         const ref = parseRepoRef(repo);
+        // Validate unconditionally so `--all --limit banana` still exits 2;
+        // with --all the paginator overrides these values.
+        const offset = parseIntFlag(opts.offset, '--offset');
+        const limit = parseIntFlag(opts.limit, '--limit');
         const filters: DocListParams = {};
         if (opts.deleted) filters.deleted = true;
         if (opts.changedAtGte !== undefined) filters.changed_at_gte = opts.changedAtGte;
@@ -142,14 +146,10 @@ export function registerDocCommands(program: Command): void {
           filters.optional_properties = opts.optionalProperties;
         }
         const docs = opts.all
-          ? await fetchAllPages((offset, limit) =>
-              listDocs(ctx.http, ref, { ...filters, offset, limit })
+          ? await fetchAllPages((pageOffset, pageLimit) =>
+              listDocs(ctx.http, ref, { ...filters, offset: pageOffset, limit: pageLimit })
             )
-          : await listDocs(ctx.http, ref, {
-              ...filters,
-              offset: parseIntFlag(opts.offset, '--offset'),
-              limit: parseIntFlag(opts.limit, '--limit'),
-            });
+          : await listDocs(ctx.http, ref, { ...filters, offset, limit });
         if (ctx.json) {
           printJson(docs);
           return;
@@ -198,7 +198,7 @@ export function registerDocCommands(program: Command): void {
   create
     .description('Create a doc in a repo')
     .argument('<repo>', REPO_ARG_HELP)
-    .requiredOption('--title <title>', 'doc title')
+    .requiredOption('--title <title>', 'doc title (required)')
     .option('--slug <slug>', 'doc slug (URL path)')
     .option('--body <content>', 'doc body content')
     .option('--body-file <path>', 'read the doc body from a file')

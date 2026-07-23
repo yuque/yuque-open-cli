@@ -46,10 +46,10 @@ YUQUE_TOKEN=YOUR_TOKEN npx @yuque/cli auth status
 
 ## 配置
 
-| 配置项            | 环境变量 / 命令行参数     | 说明                                                                                       |
-| ----------------- | ------------------------- | ------------------------------------------------------------------------------------------ |
-| Token **（必填）** | `YUQUE_TOKEN` / `--token` | 语雀个人或团队 API Token                                                                   |
-| Host（可选）      | `YUQUE_HOST` / `--host`   | 站点或空间地址，例如 `https://your-space.yuque.com` —— 绑定空间的团队 Token 和私有化部署必填 |
+| 配置项             | 环境变量 / 命令行参数     | 说明                                                                                         |
+| ------------------ | ------------------------- | -------------------------------------------------------------------------------------------- |
+| Token **（必填）** | `YUQUE_TOKEN` / `--token` | 语雀个人或团队 API Token（同时兼容读取 `YUQUE_PERSONAL_TOKEN`，可与 @yuque/mcp-server 共用） |
+| Host（可选）       | `YUQUE_HOST` / `--host`   | 站点或空间地址，例如 `https://your-space.yuque.com` —— 绑定空间的团队 Token 和私有化部署必填 |
 
 命令行参数优先于环境变量，随手 `--token` 覆盖一次总是生效。站点地址会自动规范化（自动补 `/api/v2`）；不设置时默认 `https://www.yuque.com`。
 
@@ -57,34 +57,34 @@ YUQUE_TOKEN=YOUR_TOKEN npx @yuque/cli auth status
 
 每条命令都对应[语雀 OpenAPI](https://www.yuque.com/yuque/developer/api) —— 映射关系由契约测试锁定在内置规格文件上。
 
-| 分类       | 命令                                 | 说明                                    |
-| ---------- | ------------------------------------ | --------------------------------------- |
-| **认证**   | `ping`                               | 验证与语雀 API 的连通性                 |
-|            | `auth status`                        | 查看当前登录身份                        |
-| **用户**   | `user info`                          | 查看当前 Token 对应的用户               |
-|            | `user groups <user>`                 | 列出用户加入的团队                      |
-| **搜索**   | `search <query>`                     | 搜索文档或知识库，支持分页              |
-| **知识库** | `repo list <login>`                  | 列出用户或团队（`--group`）的知识库     |
-|            | `repo get <repo>`                    | 按 id 或 `owner/slug` 查看知识库        |
-|            | `repo create <login>`                | 创建知识库                              |
-|            | `repo update <repo>`                 | 更新名称、路径、简介或可见性            |
-|            | `repo delete <repo>`                 | 删除知识库 —— 需要确认                  |
-| **文档**   | `doc list <repo>`                    | 列出知识库中的文档，`--all` 拉取全量    |
-|            | `doc get <repo> <doc>`               | 输出文档 markdown 正文（管道友好）      |
-|            | `doc create <repo>`                  | 从 `--body` 或 `--body-file` 创建文档   |
-|            | `doc update <repo> <doc>`            | 更新文档正文或元信息                    |
-|            | `doc delete <repo> <doc>`            | 删除文档 —— 需要确认                    |
-|            | `doc versions <doc-id>`              | 列出文档的版本历史                      |
-|            | `doc version <version-id>`           | 查看某个版本的内容                      |
-| **目录**   | `toc get <repo>`                     | 以树形输出知识库目录                    |
-|            | `toc update <repo>`                  | 追加、移动、编辑或删除目录节点          |
-| **团队**   | `group members <login>`              | 列出团队成员                            |
-|            | `group member set <login> <user>`    | 添加成员或调整角色                      |
-|            | `group member remove <login> <user>` | 移除成员 —— 需要确认                    |
-| **统计**   | `stats group <login>`                | 团队维度统计                            |
-|            | `stats members <login>`              | 成员维度统计                            |
-|            | `stats books <login>`                | 知识库维度统计                          |
-|            | `stats docs <login>`                 | 文档维度统计                            |
+| 分类       | 命令                                 | 说明                                                               |
+| ---------- | ------------------------------------ | ------------------------------------------------------------------ |
+| **认证**   | `ping`                               | 验证与语雀 API 的连通性                                            |
+|            | `auth status`                        | 查看当前登录身份                                                   |
+| **用户**   | `user info`                          | 查看当前 Token 对应的用户                                          |
+|            | `user groups <user>`                 | 列出用户加入的团队                                                 |
+| **搜索**   | `search <query>`                     | 搜索文档或知识库，支持分页                                         |
+| **知识库** | `repo list <login>`                  | 列出用户或团队（`--group`）的知识库                                |
+|            | `repo get <repo>`                    | 按 id 或 `owner/slug` 查看知识库                                   |
+|            | `repo create <login>`                | 创建知识库                                                         |
+|            | `repo update <repo>`                 | 更新名称、路径、简介、可见性或目录                                 |
+|            | `repo delete <repo>`                 | 删除知识库 —— 需要确认                                             |
+| **文档**   | `doc list <repo>`                    | 列出知识库中的文档，`--all` 拉取全量                               |
+|            | `doc get <repo> <doc>`               | 输出文档 markdown 正文；也接受全局 `<doc-id>`，`--meta` 查看元信息 |
+|            | `doc create <repo>`                  | 从 `--body` 或 `--body-file` 创建文档                              |
+|            | `doc update <repo> <doc>`            | 更新文档正文或元信息                                               |
+|            | `doc delete <repo> <doc>`            | 删除文档 —— 需要确认                                               |
+|            | `doc versions <doc-id>`              | 列出文档的版本历史                                                 |
+|            | `doc version <version-id>`           | 查看某个版本的内容                                                 |
+| **目录**   | `toc get <repo>`                     | 以树形输出知识库目录                                               |
+|            | `toc update <repo>`                  | 追加、头插、编辑或删除目录节点                                     |
+| **团队**   | `group members <login>`              | 列出团队成员                                                       |
+|            | `group member set <login> <user>`    | 添加成员或调整角色                                                 |
+|            | `group member remove <login> <user>` | 移除成员 —— 需要确认                                               |
+| **统计**   | `stats group <login>`                | 团队维度统计                                                       |
+|            | `stats members <login>`              | 成员维度统计                                                       |
+|            | `stats books <login>`                | 知识库维度统计                                                     |
+|            | `stats docs <login>`                 | 文档维度统计                                                       |
 
 知识库参数在所有命令中都同时接受数字 id 和 `owner/slug` 路径。各命令的完整参数见 `yuque <命令> --help`。
 
@@ -98,14 +98,14 @@ yuque doc list team/handbook --all --json | jq -r '.[].slug'
 
 退出码保持稳定，脚本可以放心分支：
 
-| 退出码 | 含义             |
-| ------ | ---------------- |
-| `0`    | 成功             |
-| `1`    | API 或未知错误   |
-| `2`    | 用法错误         |
-| `3`    | 认证错误         |
-| `4`    | 资源不存在       |
-| `5`    | 触发限流         |
+| 退出码 | 含义           |
+| ------ | -------------- |
+| `0`    | 成功           |
+| `1`    | API 或未知错误 |
+| `2`    | 用法错误       |
+| `3`    | 认证错误       |
+| `4`    | 资源不存在     |
+| `5`    | 触发限流       |
 
 管道输出时自动关闭颜色，也可用 `NO_COLOR=1` 强制关闭。限流与瞬时错误会自动退避重试后再失败。
 
@@ -115,13 +115,13 @@ yuque doc list team/handbook --all --json | jq -r '.[].slug'
 
 ## 常见问题
 
-| 错误                            | 解决方案                                                                    |
-| ------------------------------- | --------------------------------------------------------------------------- |
-| `A Yuque API token is required` | 设置 `YUQUE_TOKEN=YOUR_TOKEN` 或传入 `--token=YOUR_TOKEN`                   |
-| `401 Unauthorized`              | Token 无效或已过期 —— [重新生成](https://www.yuque.com/settings/tokens)     |
-| `429 Rate Limited`              | 请求过于频繁 —— CLI 会自动重试；`--all` 循环请放慢节奏                      |
-| `404 Not Found`                 | 检查知识库 id / `owner/slug` 路径以及文档 slug 是否正确                     |
-| 找不到 `npm` 命令               | 安装 [Node.js](https://nodejs.org/) v20 或更高版本                          |
+| 错误                                                  | 解决方案                                                                                  |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `A Yuque API token is required`                       | 设置 `YUQUE_TOKEN=YOUR_TOKEN` 或传入 `--token=YOUR_TOKEN`                                 |
+| `token invalid or expired`（退出码 `3`）              | [重新生成 Token](https://www.yuque.com/settings/tokens)，或检查 `YUQUE_TOKEN` / `--token` |
+| `rate limited by the Yuque API`（退出码 `5`）         | CLI 会自动重试；`--all` 循环请放慢节奏                                                    |
+| `the requested resource does not exist`（退出码 `4`） | 检查知识库 id / `owner/slug` 路径以及文档 slug 是否正确                                   |
+| 找不到 `npm` 命令                                     | 安装 [Node.js](https://nodejs.org/) v20 或更高版本                                        |
 
 ## 参与开发
 

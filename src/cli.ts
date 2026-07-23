@@ -18,7 +18,7 @@ export function buildProgram(): Command {
   program
     .description('Yuque (语雀) from the terminal — browse, edit, and manage your knowledge base')
     .version(VERSION, '-v, --version', 'print the CLI version')
-    .option('--token <token>', 'Yuque API token (overrides YUQUE_TOKEN)')
+    .option('--token <token>', 'Yuque API token (overrides YUQUE_TOKEN / YUQUE_PERSONAL_TOKEN)')
     .option('--host <host>', 'Yuque host, e.g. https://your-space.yuque.com (overrides YUQUE_HOST)')
     .option('--json', 'print the full API response as JSON')
     .showHelpAfterError('(run with --help for usage)');

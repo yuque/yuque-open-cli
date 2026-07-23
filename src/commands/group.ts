@@ -64,7 +64,7 @@ export function registerGroupCommands(program: Command): void {
     .argument('<login>', 'group login or numeric id')
     .argument('<user>', 'user login or numeric id')
     .addOption(
-      new Option('--role <role>', 'role (0: admin, 1: member, 2: read-only)')
+      new Option('--role <role>', 'role (0: admin, 1: member, 2: read-only) (required)')
         .choices(['0', '1', '2'])
         .makeOptionMandatory()
     )

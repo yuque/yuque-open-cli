@@ -151,11 +151,11 @@ describe('stats commands', () => {
       );
     });
 
-    it('--json prints the full page payload including total', async () => {
+    it('--json prints the member rows as a bare array (same shape as --all)', async () => {
       request.mockResolvedValueOnce(envelope(membersPage));
       const code = await run('stats', 'members', 'mygroup', '--json');
       expect(code).toBe(0);
-      expect(JSON.parse(stdoutText())).toEqual(membersPage);
+      expect(JSON.parse(stdoutText())).toEqual(membersPage.members);
     });
 
     it('--all drains pages at max page size and keeps filters', async () => {
@@ -192,13 +192,12 @@ describe('stats commands', () => {
   });
 
   describe('stats books', () => {
+    const booksPage = {
+      books: [{ book_id: 7, name: 'Handbook', slug: 'handbook', post_count: 12, read_count: 300 }],
+      total: 1,
+    };
+
     it('GETs /statistics/books and prints a table', async () => {
-      const booksPage = {
-        books: [
-          { book_id: 7, name: 'Handbook', slug: 'handbook', post_count: 12, read_count: 300 },
-        ],
-        total: 1,
-      };
       request.mockResolvedValueOnce(envelope(booksPage));
       const code = await run('stats', 'books', 'mygroup', '--sort-field', 'word_count');
       expect(code).toBe(0);
@@ -209,6 +208,13 @@ describe('stats commands', () => {
         data: undefined,
       });
       expect(stdoutText()).toContain('Handbook');
+    });
+
+    it('--json prints the book rows as a bare array (same shape as --all)', async () => {
+      request.mockResolvedValueOnce(envelope(booksPage));
+      const code = await run('stats', 'books', 'mygroup', '--json');
+      expect(code).toBe(0);
+      expect(JSON.parse(stdoutText())).toEqual(booksPage.books);
     });
   });
 
@@ -230,12 +236,12 @@ describe('stats commands', () => {
       expect(stdoutText()).toContain('Intro');
     });
 
-    it('--json prints the full page payload', async () => {
+    it('--json prints the doc rows as a bare array (same shape as --all)', async () => {
       const docsPage = { docs: [{ doc_id: 55, title: 'Intro' }], total: 1 };
       request.mockResolvedValueOnce(envelope(docsPage));
       const code = await run('stats', 'docs', 'mygroup', '--json');
       expect(code).toBe(0);
-      expect(JSON.parse(stdoutText())).toEqual(docsPage);
+      expect(JSON.parse(stdoutText())).toEqual(docsPage.docs);
     });
   });
 

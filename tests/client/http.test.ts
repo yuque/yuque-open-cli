@@ -26,6 +26,13 @@ function axiosFailure(status: number, message = 'boom', headers: Record<string, 
   return error;
 }
 
+function networkFailure(code: string, message = 'socket hang up') {
+  const error = new Error(message) as Error & { isAxiosError: boolean; code: string };
+  error.isAxiosError = true;
+  error.code = code;
+  return error;
+}
+
 describe('YuqueHttp', () => {
   const request = vi.fn();
   const sleep = vi.fn(() => Promise.resolve());
@@ -77,12 +84,97 @@ describe('YuqueHttp', () => {
     expect(sleep).toHaveBeenCalledWith(2000);
   });
 
-  it('gives up after maxRetries and throws a YuqueError with hint', async () => {
+  it('caps Retry-After delays at 10 seconds', async () => {
+    request
+      .mockRejectedValueOnce(axiosFailure(429, 'rate limited', { 'retry-after': '60' }))
+      .mockResolvedValueOnce({ data: { data: 'ok' } });
+    await makeHttp().get('/user');
+    expect(sleep).toHaveBeenCalledWith(10000);
+  });
+
+  it('backs off exponentially and caps the delay at 4000ms', async () => {
     request.mockRejectedValue(axiosFailure(429, 'rate limited'));
-    const promise = makeHttp(2).get('/user');
-    await expect(promise).rejects.toBeInstanceOf(YuqueError);
-    await expect(makeHttp(0).get('/user')).rejects.toThrow(/rate limited/);
-    expect(request).toHaveBeenCalledTimes(4); // 3 attempts (maxRetries=2) + 1 (maxRetries=0)
+    await expect(makeHttp(4).get('/user')).rejects.toBeInstanceOf(YuqueError);
+    expect(sleep.mock.calls).toEqual([[500], [1000], [2000], [4000]]);
+  });
+
+  it.each([502, 503, 504])('retries GET on %i then succeeds', async (status) => {
+    request
+      .mockRejectedValueOnce(axiosFailure(status, 'upstream error'))
+      .mockResolvedValueOnce({ data: { data: 'ok' } });
+    await expect(makeHttp().get('/user')).resolves.toEqual({ data: 'ok' });
+    expect(sleep).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not retry 500', async () => {
+    request.mockRejectedValue(axiosFailure(500, 'server error'));
+    await expect(makeHttp().get('/user')).rejects.toMatchObject({ statusCode: 500 });
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(sleep).not.toHaveBeenCalled();
+  });
+
+  it('retries GET network errors without a response', async () => {
+    request
+      .mockRejectedValueOnce(networkFailure('ECONNRESET'))
+      .mockResolvedValueOnce({ data: { data: 'ok' } });
+    await expect(makeHttp().get('/user')).resolves.toEqual({ data: 'ok' });
+    expect(sleep).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not retry canceled requests', async () => {
+    request.mockRejectedValue(networkFailure('ERR_CANCELED', 'canceled'));
+    await expect(makeHttp().get('/user')).rejects.toBeInstanceOf(YuqueError);
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(sleep).not.toHaveBeenCalled();
+  });
+
+  it('does not retry a POST that failed without a response and flags the ambiguity', async () => {
+    request.mockRejectedValue(networkFailure('ECONNABORTED', 'timeout of 30000ms exceeded'));
+    const error = await makeHttp()
+      .post('/repos/g/r/docs', { title: 'T' })
+      .catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(YuqueError);
+    expect((error as YuqueError).message).toBe(
+      'timeout of 30000ms exceeded (the request may still have been applied — verify before retrying)'
+    );
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(sleep).not.toHaveBeenCalled();
+  });
+
+  it.each(['post', 'put', 'delete'] as const)('does not retry %s on 502', async (method) => {
+    request.mockRejectedValue(axiosFailure(502, 'bad gateway'));
+    await expect(makeHttp()[method]('/repos/1')).rejects.toMatchObject({ statusCode: 502 });
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(sleep).not.toHaveBeenCalled();
+  });
+
+  it('still retries POST on 429 (request was not processed)', async () => {
+    request
+      .mockRejectedValueOnce(axiosFailure(429, 'rate limited'))
+      .mockResolvedValueOnce({ data: { data: 'ok' } });
+    await expect(makeHttp().post('/repos', { name: 'n' })).resolves.toEqual({ data: 'ok' });
+    expect(sleep).toHaveBeenCalledTimes(1);
+  });
+
+  it('gives up after maxRetries and throws a YuqueError with the 429 hint', async () => {
+    request.mockRejectedValue(axiosFailure(429, 'rate limited'));
+    const error = await makeHttp(2)
+      .get('/user')
+      .catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(YuqueError);
+    expect(error).toMatchObject({
+      statusCode: 429,
+      message: 'rate limited (rate limited by the Yuque API — wait a moment and retry)',
+    });
+    expect(request).toHaveBeenCalledTimes(3); // 1 attempt + 2 retries
+    expect(sleep).toHaveBeenCalledTimes(2);
+  });
+
+  it('maxRetries=0 disables retries entirely', async () => {
+    request.mockRejectedValue(axiosFailure(429, 'rate limited'));
+    await expect(makeHttp(0).get('/user')).rejects.toMatchObject({ statusCode: 429 });
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(sleep).not.toHaveBeenCalled();
   });
 
   it('does not retry non-retryable statuses', async () => {

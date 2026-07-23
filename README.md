@@ -46,10 +46,10 @@ YUQUE_TOKEN=YOUR_TOKEN npx @yuque/cli auth status
 
 ## Configuration
 
-| Setting              | Env var / CLI flag        | Description                                                                                                            |
-| -------------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Token **(required)** | `YUQUE_TOKEN` / `--token` | Personal or team Yuque API token                                                                                       |
-| Host (optional)      | `YUQUE_HOST` / `--host`   | Site or space host, e.g. `https://your-space.yuque.com` — required for space-bound team tokens and private deployments |
+| Setting              | Env var / CLI flag        | Description                                                                                                                          |
+| -------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Token **(required)** | `YUQUE_TOKEN` / `--token` | Personal or team Yuque API token (also reads `YUQUE_PERSONAL_TOKEN` as a compatibility fallback, e.g. shared with @yuque/mcp-server) |
+| Host (optional)      | `YUQUE_HOST` / `--host`   | Site or space host, e.g. `https://your-space.yuque.com` — required for space-bound team tokens and private deployments               |
 
 Flags win over env vars, so a one-off `--token` override always works. Site roots are normalized (`/api/v2` is appended automatically); when unset, the host defaults to `https://www.yuque.com`.
 
@@ -57,34 +57,34 @@ Flags win over env vars, so a one-off `--token` override always works. Site root
 
 Each command maps to the [Yuque OpenAPI](https://www.yuque.com/yuque/developer/api) — the mapping is locked by a contract test against the vendored spec.
 
-| Category   | Command                            | Description                                       |
-| ---------- | ---------------------------------- | ------------------------------------------------- |
-| **Auth**   | `ping`                             | Verify connectivity to the Yuque API              |
-|            | `auth status`                      | Show who you are signed in as                     |
-| **User**   | `user info`                        | Show the authenticated user                       |
-|            | `user groups <user>`               | List groups a user belongs to                     |
-| **Search** | `search <query>`                   | Search docs or repos, with paging                 |
-| **Repos**  | `repo list <login>`                | List repos (知识库) of a user or `--group`        |
-|            | `repo get <repo>`                  | Show a repo by id or `owner/slug`                 |
-|            | `repo create <login>`              | Create a repo                                     |
-|            | `repo update <repo>`               | Update name, slug, description, or visibility     |
-|            | `repo delete <repo>`               | Delete a repo — asks for confirmation             |
-| **Docs**   | `doc list <repo>`                  | List docs in a repo, `--all` drains paging        |
-|            | `doc get <repo> <doc>`             | Print a doc's markdown body (pipe-friendly)       |
-|            | `doc create <repo>`                | Create a doc from `--body` or `--body-file`       |
-|            | `doc update <repo> <doc>`          | Update a doc's body or metadata                   |
-|            | `doc delete <repo> <doc>`          | Delete a doc — asks for confirmation              |
-|            | `doc versions <doc-id>`            | List a doc's version history                      |
-|            | `doc version <version-id>`         | Show one version's content                        |
-| **TOC**    | `toc get <repo>`                   | Print a repo's table of contents as a tree        |
-|            | `toc update <repo>`                | Append, move, edit, or remove a TOC node          |
-| **Groups** | `group members <login>`            | List members of a group                           |
-|            | `group member set <login> <user>`  | Add a member or change their role                 |
-|            | `group member remove <login> <user>` | Remove a member — asks for confirmation         |
-| **Stats**  | `stats group <login>`              | Group-level statistics                            |
-|            | `stats members <login>`            | Per-member statistics                             |
-|            | `stats books <login>`              | Per-repo statistics                               |
-|            | `stats docs <login>`               | Per-doc statistics                                |
+| Category   | Command                              | Description                                                                        |
+| ---------- | ------------------------------------ | ---------------------------------------------------------------------------------- |
+| **Auth**   | `ping`                               | Verify connectivity to the Yuque API                                               |
+|            | `auth status`                        | Show who you are signed in as                                                      |
+| **User**   | `user info`                          | Show the authenticated user                                                        |
+|            | `user groups <user>`                 | List groups a user belongs to                                                      |
+| **Search** | `search <query>`                     | Search docs or repos, with paging                                                  |
+| **Repos**  | `repo list <login>`                  | List repos (知识库) of a user or `--group`                                         |
+|            | `repo get <repo>`                    | Show a repo by id or `owner/slug`                                                  |
+|            | `repo create <login>`                | Create a repo                                                                      |
+|            | `repo update <repo>`                 | Update name, slug, description, visibility, or TOC                                 |
+|            | `repo delete <repo>`                 | Delete a repo — asks for confirmation                                              |
+| **Docs**   | `doc list <repo>`                    | List docs in a repo, `--all` drains paging                                         |
+|            | `doc get <repo> <doc>`               | Print a doc's markdown body; also takes a global `<doc-id>`, `--meta` for metadata |
+|            | `doc create <repo>`                  | Create a doc from `--body` or `--body-file`                                        |
+|            | `doc update <repo> <doc>`            | Update a doc's body or metadata                                                    |
+|            | `doc delete <repo> <doc>`            | Delete a doc — asks for confirmation                                               |
+|            | `doc versions <doc-id>`              | List a doc's version history                                                       |
+|            | `doc version <version-id>`           | Show one version's content                                                         |
+| **TOC**    | `toc get <repo>`                     | Print a repo's table of contents as a tree                                         |
+|            | `toc update <repo>`                  | Append, prepend, edit, or remove a TOC node                                        |
+| **Groups** | `group members <login>`              | List members of a group                                                            |
+|            | `group member set <login> <user>`    | Add a member or change their role                                                  |
+|            | `group member remove <login> <user>` | Remove a member — asks for confirmation                                            |
+| **Stats**  | `stats group <login>`                | Group-level statistics                                                             |
+|            | `stats members <login>`              | Per-member statistics                                                              |
+|            | `stats books <login>`                | Per-repo statistics                                                                |
+|            | `stats docs <login>`                 | Per-doc statistics                                                                 |
 
 Repos accept either a numeric id or an `owner/slug` namespace everywhere. Run `yuque <command> --help` for all flags.
 
@@ -98,14 +98,14 @@ yuque doc list team/handbook --all --json | jq -r '.[].slug'
 
 Exit codes are stable, so scripts can branch on them:
 
-| Code | Meaning                       |
-| ---- | ----------------------------- |
-| `0`  | Success                       |
-| `1`  | API or unknown error          |
-| `2`  | Usage error                   |
-| `3`  | Authentication error          |
-| `4`  | Not found                     |
-| `5`  | Rate limited                  |
+| Code | Meaning              |
+| ---- | -------------------- |
+| `0`  | Success              |
+| `1`  | API or unknown error |
+| `2`  | Usage error          |
+| `3`  | Authentication error |
+| `4`  | Not found            |
+| `5`  | Rate limited         |
 
 Colors are disabled automatically when piping, or force-off with `NO_COLOR=1`. Rate-limited and transient errors are retried with backoff before failing.
 
@@ -115,13 +115,13 @@ Colors are disabled automatically when piping, or force-off with `NO_COLOR=1`. R
 
 ## Troubleshooting
 
-| Error                        | Solution                                                                          |
-| ---------------------------- | --------------------------------------------------------------------------------- |
-| `A Yuque API token is required` | Set `YUQUE_TOKEN=YOUR_TOKEN` or pass `--token=YOUR_TOKEN`                      |
-| `401 Unauthorized`           | Token invalid or expired — [regenerate it](https://www.yuque.com/settings/tokens) |
-| `429 Rate Limited`           | Too many requests — the CLI retries automatically; slow down `--all` loops        |
-| `404 Not Found`              | Check the repo id / `owner/slug` namespace and the doc slug                       |
-| `npm` command not found      | Install [Node.js](https://nodejs.org/) v20 or later                               |
+| Error                                              | Solution                                                                                       |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `A Yuque API token is required`                    | Set `YUQUE_TOKEN=YOUR_TOKEN` or pass `--token=YOUR_TOKEN`                                      |
+| `token invalid or expired` (exit `3`)              | [Regenerate the token](https://www.yuque.com/settings/tokens) or fix `YUQUE_TOKEN` / `--token` |
+| `rate limited by the Yuque API` (exit `5`)         | The CLI retries automatically; slow down `--all` loops                                         |
+| `the requested resource does not exist` (exit `4`) | Check the repo id / `owner/slug` namespace and the doc slug                                    |
+| `npm` command not found                            | Install [Node.js](https://nodejs.org/) v20 or later                                            |
 
 ## Development
 
