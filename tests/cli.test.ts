@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import axios from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { runCli } from '../src/cli.js';
 
 vi.mock('axios', async (importOriginal) => {
@@ -62,23 +62,26 @@ describe('runCli', () => {
 });
 
 describe('runCli exit code contract for API errors', () => {
-  let stderr: ReturnType<typeof vi.spyOn>;
+  let stderrChunks: string[] = [];
 
   beforeEach(() => {
     request.mockReset();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockedAxios.create.mockReturnValue({ request } as any);
+    mockedAxios.create.mockReturnValue({ request } as unknown as AxiosInstance);
     vi.stubEnv('YUQUE_TOKEN', 'test-token');
-    stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    stderrChunks = [];
+    vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+      stderrChunks.push(String(chunk));
+      return true;
+    });
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
-    stderr.mockRestore();
+    vi.restoreAllMocks();
   });
 
   function stderrText(): string {
-    return stderr.mock.calls.map((call) => String(call[0])).join('');
+    return stderrChunks.join('');
   }
 
   function apiFailure(status: number, message: string) {

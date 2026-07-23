@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 /**
  * Functional (e2e) suite: spawns the built dist/bin.js against a local mock
- * Yuque API. Requires `npm run build` first; run via `npm run test:e2e`.
+ * Yuque API. The `npm run test:e2e` script builds before invoking this config.
  */
 export default defineConfig({
   test: {

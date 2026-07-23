@@ -2,14 +2,13 @@
 
 This suite runs the **built binary** (`dist/bin.js`) as a subprocess — argv parsing,
 config resolution, HTTP wire format, rendering, retry, and exit codes are all exercised
-with zero mocks inside the process under test. Build first, then run:
+with zero mocks inside the process under test. The command builds first, then runs:
 
 ```bash
-npm run build
 npm run test:e2e
 ```
 
-`npm run check` (the merge gate) runs it automatically after the build step.
+`npm run check` (the merge gate) shares one build between this suite and the dist smoke test.
 
 ## Two layers
 
@@ -29,10 +28,10 @@ vitest process, so a synchronous spawn would freeze the event loop and deadlock.
 | `YUQUE_E2E=1`                                                 | Enable read paths + error contract against the live API           |
 | `YUQUE_E2E_TOKEN`                                             | Personal token used by the read paths                             |
 | `YUQUE_E2E_LOGIN`                                             | Optional login override (otherwise resolved via `auth status`)    |
-| `YUQUE_E2E_REPO`                                              | Optional repo to read; **required** when write mode is on         |
-| `YUQUE_E2E_WRITE=1`                                           | Enable the doc create/update/delete lifecycle in the sandbox repo |
+| `YUQUE_E2E_REPO`                                              | Optional book to read; **required** when write mode is on         |
+| `YUQUE_E2E_WRITE=1`                                           | Enable the doc create/update/delete lifecycle in the sandbox book |
 | `YUQUE_E2E_TEAM_TOKEN` / `YUQUE_E2E_HOST` / `YUQUE_E2E_GROUP` | Team/space-token paths (groups, stats)                            |
-| `YUQUE_E2E_REPO_LIFECYCLE=1`                                  | Repo create/delete — local only, never wired into CI              |
+| `YUQUE_E2E_REPO_LIFECYCLE=1`                                  | Book create/delete — local only, never wired into CI              |
 
 CI wiring lives in `.github/workflows/ci.yml`: every push/PR (plus a weekly schedule
 for API-drift detection) runs `npm run check`, and the real-API read paths turn on

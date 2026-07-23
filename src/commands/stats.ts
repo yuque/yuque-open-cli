@@ -106,9 +106,8 @@ function limitFlag(value: string): number {
   return limit;
 }
 
-// Enum validation lives in argParsers (not Option.choices) so violations throw
-// UsageError and exit 2; commander's own choices error path calls process.exit
-// on subcommands created before runCli installs exitOverride on the root.
+// Keep enum validation in argParsers to preserve the command-specific error
+// wording. Option.choices errors also satisfy the exit-code contract.
 function parseChoice(flag: string, choices: readonly string[]): (value: string) => string {
   return (value) => {
     if (!choices.includes(value)) {

@@ -132,11 +132,11 @@ cd yuque-open-cli
 npm install
 npm test              # unit tests
 npm run build         # compile TypeScript
-npm run test:e2e      # functional tests: the built binary vs a mock Yuque API
+npm run test:e2e      # build, then run the binary against a mock Yuque API
 npm run dev -- --help # run from source
 ```
 
-The command surface is pinned to [spec/yuque-openapi.yaml](./spec/yuque-openapi.yaml) by [tests/spec-coverage.test.ts](./tests/spec-coverage.test.ts); `npm run check` is the merge gate.
+The command surface is pinned to [spec/yuque-openapi.yaml](./spec/yuque-openapi.yaml) by [tests/spec-coverage.test.ts](./tests/spec-coverage.test.ts); `npm run check` is the merge gate (lint, formatting, type checking, coverage-enforced unit tests, one build, dist smoke, and functional e2e).
 
 ## Links
 
@@ -148,7 +148,7 @@ The command surface is pinned to [spec/yuque-openapi.yaml](./spec/yuque-openapi.
 
 [MIT](./LICENSE)
 
-[ci-image]: https://img.shields.io/github/actions/workflow/status/yuque/yuque-cli/ci.yml?style=flat-square&label=CI
+[ci-image]: https://img.shields.io/github/actions/workflow/status/yuque/yuque-open-cli/ci.yml?style=flat-square&label=CI
 [ci-url]: https://github.com/yuque/yuque-open-cli/actions/workflows/ci.yml
 [npm-image]: https://img.shields.io/npm/v/yuque-open-cli?style=flat-square
 [npm-url]: https://www.npmjs.com/package/yuque-open-cli

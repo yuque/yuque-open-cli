@@ -45,13 +45,13 @@ export class FixtureServer {
   async start(): Promise<string> {
     this.server = createServer((req, res) => {
       const chunks: Buffer[] = [];
-      req.on('data', (chunk) => chunks.push(chunk));
+      req.on('data', (chunk: Buffer) => chunks.push(chunk));
       req.on('end', () => {
         const url = new URL(req.url ?? '/', 'http://localhost');
         const raw = Buffer.concat(chunks).toString('utf8');
         let body: unknown;
         try {
-          body = raw === '' ? undefined : JSON.parse(raw);
+          body = raw === '' ? undefined : (JSON.parse(raw) as unknown);
         } catch {
           body = raw;
         }
