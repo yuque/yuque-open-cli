@@ -1,9 +1,10 @@
 # Changelog
 
-## 2.0.0
+## 1.1.0
 
-Breaking: knowledge bases are now `book` across the CLI surface, aligning with
-Yuque's own terminology (知识库 = book, matching the API's `V2Book`/`book_id`):
+Knowledge bases are now `book` across the CLI surface, aligning with Yuque's
+own terminology (知识库 = book, matching the API's `V2Book`/`book_id`). The
+`repo` command group from 1.0.0 (released the same day) is replaced by `book`:
 
 - `repo list/get/create/update/delete` → `book list/get/create/update/delete`;
   `<repo>` arguments are now `<book>`.
