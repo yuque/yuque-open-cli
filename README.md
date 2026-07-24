@@ -87,7 +87,7 @@ Each command maps to the [Yuque OpenAPI](https://www.yuque.com/yuque/developer/a
 |            | `stats books <login>`                | Per-book statistics                                                                |
 |            | `stats docs <login>`                 | Per-doc statistics                                                                 |
 
-Books (知识库) accept either a numeric id or an `owner/slug` namespace everywhere. Run `yuque <command> --help` for all flags.
+Books (知识库) accept either a numeric id or an `owner/slug` namespace everywhere. For data-table docs, `doc get` accepts `--page` and `--page-size` to page the content. Run `yuque <command> --help` for all flags.
 
 ## Output & scripting
 

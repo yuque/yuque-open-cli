@@ -208,13 +208,22 @@ describe('auth / user / search commands', () => {
         'zhangsan',
         '--page',
         '2',
+        '--offset',
+        '3',
       ]);
       expect(code).toBe(0);
       expect(request).toHaveBeenCalledWith(
         expect.objectContaining({
           method: 'get',
           url: '/search',
-          params: { q: 'guide', type: 'doc', scope: 'yuque/help', creator: 'zhangsan', page: 2 },
+          params: {
+            q: 'guide',
+            type: 'doc',
+            scope: 'yuque/help',
+            creator: 'zhangsan',
+            page: 2,
+            offset: 3,
+          },
         })
       );
       const output = stdout.join('');
@@ -230,6 +239,8 @@ describe('auth / user / search commands', () => {
       expect(request).toHaveBeenCalledWith(
         expect.objectContaining({ params: { q: 'guide', type: 'repo' } })
       );
+      const config = request.mock.calls[0][0] as { params: Record<string, unknown> };
+      expect(config.params).not.toHaveProperty('offset');
       expect(JSON.parse(stdout.join(''))).toEqual(results);
     });
 

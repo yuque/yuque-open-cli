@@ -244,6 +244,14 @@
         {
           "flags": "--meta",
           "description": "print metadata instead of the body"
+        },
+        {
+          "flags": "--page <n>",
+          "description": "data-table content page number"
+        },
+        {
+          "flags": "--page-size <n>",
+          "description": "data-table content page size (max 200)"
         }
       ]
     },
@@ -459,6 +467,10 @@
         {
           "flags": "--creator <login>",
           "description": "only results created by this user"
+        },
+        {
+          "flags": "--offset <n>",
+          "description": "legacy page number sent as API offset (not a record offset)"
         },
         {
           "flags": "--page <n>",

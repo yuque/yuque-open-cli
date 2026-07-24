@@ -142,7 +142,7 @@ const CONSTRAINT_PINS: Record<string, ConstraintPin[]> = {
       param: 'offset',
       minimum: 1,
       maximum: 100,
-      cli: null,
+      cli: flagCli('search', '--offset', ['search', 'needle', '--type', 'doc'], 'params', 'offset'),
     },
   ],
   group_api_v2_group_member_list: [
@@ -221,9 +221,14 @@ const CONSTRAINT_PINS: Record<string, ConstraintPin[]> = {
       param: 'page_size',
       minimum: 1,
       maximum: 200,
-      cli: null,
+      cli: flagCli('doc get', '--page-size', ['doc', 'get', '1'], 'params', 'page_size'),
     },
-    { in: 'query', param: 'page', minimum: 1, cli: null },
+    {
+      in: 'query',
+      param: 'page',
+      minimum: 1,
+      cli: flagCli('doc get', '--page', ['doc', 'get', '1'], 'params', 'page'),
+    },
   ],
   'doc_api_v2_doc_show-by_book_and_id': [
     {
@@ -231,9 +236,14 @@ const CONSTRAINT_PINS: Record<string, ConstraintPin[]> = {
       param: 'page_size',
       minimum: 1,
       maximum: 200,
-      cli: null,
+      cli: flagCli('doc get', '--page-size', ['doc', 'get', '1', 'doc'], 'params', 'page_size'),
     },
-    { in: 'query', param: 'page', minimum: 1, cli: null },
+    {
+      in: 'query',
+      param: 'page',
+      minimum: 1,
+      cli: flagCli('doc get', '--page', ['doc', 'get', '1', 'doc'], 'params', 'page'),
+    },
   ],
   'doc_api_v2_doc_update-by_id': [
     {
@@ -303,9 +313,20 @@ const CONSTRAINT_PINS: Record<string, ConstraintPin[]> = {
       param: 'page_size',
       minimum: 1,
       maximum: 200,
-      cli: null,
+      cli: flagCli(
+        'doc get',
+        '--page-size',
+        ['doc', 'get', 'team/book', 'doc'],
+        'params',
+        'page_size'
+      ),
     },
-    { in: 'query', param: 'page', minimum: 1, cli: null },
+    {
+      in: 'query',
+      param: 'page',
+      minimum: 1,
+      cli: flagCli('doc get', '--page', ['doc', 'get', 'team/book', 'doc'], 'params', 'page'),
+    },
   ],
   doc_api_v2_doc_update: [
     {

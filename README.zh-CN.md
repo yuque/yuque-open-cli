@@ -87,7 +87,7 @@ YUQUE_TOKEN=YOUR_TOKEN npx yuque-open-cli auth status
 |            | `stats books <login>`                | 知识库维度统计                                                     |
 |            | `stats docs <login>`                 | 文档维度统计                                                       |
 
-知识库参数在所有命令中都同时接受数字 id 和 `owner/slug` 路径。各命令的完整参数见 `yuque <命令> --help`。
+知识库参数在所有命令中都同时接受数字 id 和 `owner/slug` 路径。对于数据表文档，`doc get` 接受 `--page` 和 `--page-size` 对正文进行分页。各命令的完整参数见 `yuque <命令> --help`。
 
 ## 输出与脚本化
 

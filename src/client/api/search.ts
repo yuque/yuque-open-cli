@@ -10,6 +10,8 @@ export interface SearchParams {
   creator?: string;
   /** Page number (page size is fixed at 20 by the API). */
   page?: number;
+  /** Deprecated API page-number alias named `offset`; it is not a record offset. */
+  offset?: number;
 }
 
 /** GET /search — generic search over docs or repos. */
@@ -17,9 +19,10 @@ export async function search(http: YuqueHttp, params: SearchParams): Promise<V2S
   const res = await http.get<ApiEnvelope<V2SearchResult[]>>('/search', {
     q: params.q,
     type: params.type,
-    scope: params.scope,
-    creator: params.creator,
-    page: params.page,
+    ...(params.scope !== undefined && { scope: params.scope }),
+    ...(params.creator !== undefined && { creator: params.creator }),
+    ...(params.page !== undefined && { page: params.page }),
+    ...(params.offset !== undefined && { offset: params.offset }),
   });
   return res.data;
 }

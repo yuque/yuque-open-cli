@@ -187,6 +187,19 @@ describe('doc commands', () => {
       expect(stdoutText()).toBe('# Hello\n\nWorld.\n');
     });
 
+    it('forwards data-table content page flags using the spec query names', async () => {
+      request.mockResolvedValueOnce(ok(detail));
+      await expect(
+        runCli(argv('doc', 'get', 'yuque/help', 'intro', '--page', '2', '--page-size', '50'))
+      ).resolves.toBe(0);
+      expect(request).toHaveBeenCalledWith({
+        method: 'get',
+        url: '/repos/yuque/help/docs/intro',
+        params: { page: 2, page_size: 50 },
+        data: undefined,
+      });
+    });
+
     it('with one numeric arg GETs /repos/docs/{id}', async () => {
       request.mockResolvedValueOnce(ok(detail));
       await expect(runCli(argv('doc', 'get', '42'))).resolves.toBe(0);

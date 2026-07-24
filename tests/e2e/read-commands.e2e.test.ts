@@ -60,14 +60,16 @@ describe('auth & user', () => {
 });
 
 describe('search & book', () => {
-  it('search sends q/type and renders a table', async () => {
+  it('search sends q/type and the legacy offset page number, then renders a table', async () => {
     server.route('GET', '/api/v2/search', {
       body: { data: [{ id: 1, type: 'doc', title: '灰度发布', url: '/x/y' }] },
     });
-    const result = await runYuque(['search', '灰度发布', '--type', 'doc'], { host });
+    const result = await runYuque(['search', '灰度发布', '--type', 'doc', '--offset', '4'], {
+      host,
+    });
     expect(result.code).toBe(0);
     expect(result.stdout).toContain('灰度发布');
-    expect(server.requests[0].query).toEqual({ q: '灰度发布', type: 'doc' });
+    expect(server.requests[0].query).toEqual({ q: '灰度发布', type: 'doc', offset: '4' });
   });
 
   it('book list --group --all drains pages and prints a JSON array', async () => {
@@ -111,6 +113,26 @@ describe('doc reading', () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toBe('# Hi\n\nBody.\n');
     expect(result.stderr).toBe('');
+  });
+
+  it('doc get forwards data-table content paging query parameters', async () => {
+    server.route('GET', '/api/v2/repos/yuque/help/docs/table', {
+      body: {
+        data: {
+          id: 8,
+          slug: 'table',
+          title: 'Table',
+          format: 'lakesheet',
+          body_sheet: '{"rows":[]}',
+        },
+      },
+    });
+    const result = await runYuque(
+      ['doc', 'get', 'yuque/help', 'table', '--page', '2', '--page-size', '80'],
+      { host }
+    );
+    expect(result.code).toBe(0);
+    expect(server.requests[0].query).toEqual({ page: '2', page_size: '80' });
   });
 
   it('doc get renders sheet docs from body_sheet when body is empty', async () => {
