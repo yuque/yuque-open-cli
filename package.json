@@ -1,7 +1,7 @@
 {
   "name": "yuque-open-cli",
   "version": "1.1.0",
-  "description": "Command-line interface for Yuque (语雀) — browse, edit, and manage your knowledge base from the terminal",
+  "description": "Scriptable CLI toolkit for the Yuque (语雀) Open API — search, read, write, and manage docs from scripts, pipelines, and agents",
   "type": "module",
   "main": "dist/cli.js",
   "bin": {

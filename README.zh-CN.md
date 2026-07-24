@@ -4,7 +4,7 @@
 
 <h1>Yuque CLI</h1>
 
-在终端里直接使用你的[语雀](https://www.yuque.com/)知识库 ——<br>搜索、阅读、写作、管理，一条命令搞定。
+基于[语雀](https://www.yuque.com/)开放 API 的可脚本化命令行工具集 ——<br>搜索、阅读、写作、管理，脚本、流水线与 agent 皆可调用。
 
 [![CI][ci-image]][ci-url] [![npm version][npm-image]][npm-url] [![npm downloads][download-image]][download-url] [![License][license-image]][license-url]
 
