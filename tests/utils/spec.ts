@@ -214,6 +214,41 @@ export const OPERATION_TO_COMMANDS: Record<string, OperationMapping> = {
     path: '/api/v2/groups/{login}/statistics/docs',
     commands: ['stats docs'],
   },
+  note_api_v2_note_list: {
+    method: 'get',
+    path: '/api/v2/notes',
+    commands: ['note list'],
+  },
+  note_api_v2_note_create: {
+    method: 'post',
+    path: '/api/v2/notes',
+    commands: ['note create'],
+  },
+  note_api_v2_note_show: {
+    method: 'get',
+    path: '/api/v2/notes/{id}',
+    commands: ['note get'],
+  },
+  note_api_v2_note_update: {
+    method: 'put',
+    path: '/api/v2/notes/{id}',
+    commands: ['note update'],
+  },
+  resource_api_v2_board_show: {
+    method: 'get',
+    path: '/api/v2/yfm/boards',
+    commands: ['resource get'],
+  },
+  resource_api_v2_board_create: {
+    method: 'post',
+    path: '/api/v2/yfm/boards',
+    commands: ['resource create'],
+  },
+  resource_api_v2_board_update: {
+    method: 'put',
+    path: '/api/v2/yfm/boards',
+    commands: ['resource update'],
+  },
 };
 
 export function loadSpec(): OpenApiDocument {

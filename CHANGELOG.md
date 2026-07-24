@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0
+
+- Added `note list/get/create/update` for Yuque notes (小记), including
+  `has_more` pagination, file-backed Markdown input, and the API's non-standard
+  create/update response envelopes.
+- Added `resource get/create/update` for structured boards (mind maps,
+  flowcharts, and architecture diagrams), with document locator validation and
+  text/file DSL input.
+- Extended the vendored OpenAPI contract, generated types, command/spec locks,
+  unit coverage, and always-on mock-server e2e coverage for all seven commands.
+
 ## 1.1.0
 
 Knowledge bases are now `book` across the CLI surface, aligning with Yuque's

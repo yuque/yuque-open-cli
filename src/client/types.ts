@@ -61,3 +61,24 @@ export type V2GroupStatistics = PublicSchema<'V2GroupStatistics'>;
 export type V2MemberStatistics = PublicSchema<'V2MemberStatistics'>;
 export type V2BookStatistics = PublicSchema<'V2BookStatistics'>;
 export type V2DocStatistics = PublicSchema<'V2DocStatistics'>;
+export type V2NoteContent = PublicSchema<'V2NoteContent'>;
+export type V2Note = PublicSchemaWith<'V2Note', { content?: V2NoteContent }>;
+export type V2NoteListResult = PublicSchemaWith<
+  'V2NoteListResult',
+  { pin_notes?: V2Note[]; notes?: V2Note[] }
+>;
+export type V2NoteCreateResult = PublicSchema<'V2NoteCreateResult'>;
+
+export type V2BoardType = 'mindmap' | 'flowchart' | 'architecturediagram';
+export type V2BoardJsonScalar = string | number | boolean | null;
+export type V2BoardJsonValue =
+  V2BoardJsonScalar | V2BoardJsonValue[] | { [key: string]: V2BoardJsonValue };
+export type V2BoardDsl = Record<string, V2BoardJsonValue>;
+
+type GeneratedResourceBoard = NonNullable<GeneratedSchema<'V2ResourceResult'>['board']>;
+export type V2ResourceResult = PublicSchemaWith<
+  'V2ResourceResult',
+  {
+    board?: Omit<GeneratedResourceBoard, 'dsl'> & { dsl?: V2BoardDsl } & JsonPassthrough;
+  }
+>;

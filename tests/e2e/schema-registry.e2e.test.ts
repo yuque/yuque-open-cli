@@ -6,9 +6,9 @@ describe('fixture schema registry', () => {
 
   it('indexes and compiles the OpenAPI operation schemas once', () => {
     expect(registry.summary).toEqual({
-      operations: 38,
-      requestSchemas: 11,
-      responseSchemas: 38,
+      operations: 45,
+      requestSchemas: 15,
+      responseSchemas: 45,
     });
   });
 
@@ -63,6 +63,42 @@ describe('fixture schema registry', () => {
         data: { members: [{ user_id: '1', read_count: '5' }], total: 1 },
       })
     ).toBe(true);
+  });
+
+  it('validates note envelope quirks and board locator/update bodies', () => {
+    expect(
+      registry.validateResponse('POST', '/api/v2/notes', 200, {
+        success: true,
+        data: { id: 7, slug: 'n7', note_url: 'https://example.test/n7' },
+      })
+    ).toBe(true);
+    expect(
+      registry.validateResponse('PUT', '/api/v2/notes/7', 200, {
+        data: { data: { id: 7, slug: 'n7' } },
+      })
+    ).toBe(true);
+    expect(
+      registry.validateRequest('POST', '/api/v2/yfm/boards', {
+        type: 'mindmap',
+        dsl: 'root',
+        doc_id: 9,
+      })
+    ).toBe(true);
+    expect(
+      registry.validateRequest('PUT', '/api/v2/yfm/boards', {
+        src: 'board-id',
+        url: 'https://example.test/docs/9',
+        dsl: { cells: [] },
+      })
+    ).toBe(true);
+    expect(() =>
+      registry.validateRequest('PUT', '/api/v2/yfm/boards', {
+        src: 'board-id',
+        doc_id: 9,
+        url: 'https://example.test/docs/9',
+        text: 'root',
+      })
+    ).toThrowError(/Fixture request schema validation failed/);
   });
 
   it('skips routes and response statuses with no JSON schema', () => {

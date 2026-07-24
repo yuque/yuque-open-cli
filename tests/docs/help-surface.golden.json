@@ -188,12 +188,20 @@
         {
           "flags": "--format <format>",
           "description": "content format",
-          "choices": ["markdown", "html", "lake"]
+          "choices": [
+            "markdown",
+            "html",
+            "lake"
+          ]
         },
         {
           "flags": "--public <level>",
           "description": "visibility (0 private, 1 public, 2 org-only)",
-          "choices": ["0", "1", "2"]
+          "choices": [
+            "0",
+            "1",
+            "2"
+          ]
         },
         {
           "flags": "--slug <slug>",
@@ -322,12 +330,20 @@
         {
           "flags": "--format <format>",
           "description": "content format",
-          "choices": ["markdown", "html", "lake"]
+          "choices": [
+            "markdown",
+            "html",
+            "lake"
+          ]
         },
         {
           "flags": "--public <level>",
           "description": "visibility (0 private, 1 public, 2 org-only)",
-          "choices": ["0", "1", "2"]
+          "choices": [
+            "0",
+            "1",
+            "2"
+          ]
         },
         {
           "flags": "--slug <slug>",
@@ -415,7 +431,11 @@
         {
           "flags": "--role <role>",
           "description": "role (0: admin, 1: member, 2: read-only) (required)",
-          "choices": ["0", "1", "2"]
+          "choices": [
+            "0",
+            "1",
+            "2"
+          ]
         }
       ]
     },
@@ -442,7 +462,96 @@
         {
           "flags": "--role <role>",
           "description": "filter by role (0: admin, 1: member, 2: read-only)",
-          "choices": ["0", "1", "2"]
+          "choices": [
+            "0",
+            "1",
+            "2"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "note create",
+      "description": "Create a note",
+      "arguments": [],
+      "options": [
+        {
+          "flags": "--body <content>",
+          "description": "note body in Markdown"
+        },
+        {
+          "flags": "--body-file <path>",
+          "description": "read the note body from a file"
+        }
+      ]
+    },
+    {
+      "path": "note get",
+      "description": "Show a note with its full content",
+      "arguments": [
+        {
+          "name": "id",
+          "required": true,
+          "description": "note id",
+          "variadic": false
+        }
+      ],
+      "options": []
+    },
+    {
+      "path": "note list",
+      "description": "List notes for the current user",
+      "arguments": [],
+      "options": [
+        {
+          "flags": "--all",
+          "description": "fetch every page (starts at page 1)"
+        },
+        {
+          "flags": "--limit <n>",
+          "description": "page size"
+        },
+        {
+          "flags": "--page <n>",
+          "description": "page number"
+        },
+        {
+          "flags": "--status <status>",
+          "description": "filter by note status"
+        }
+      ]
+    },
+    {
+      "path": "note update",
+      "description": "Update a note",
+      "arguments": [
+        {
+          "name": "id",
+          "required": true,
+          "description": "note id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--abstract <text>",
+          "description": "content abstract"
+        },
+        {
+          "flags": "--html <html>",
+          "description": "HTML content"
+        },
+        {
+          "flags": "--source <markdown>",
+          "description": "Markdown source"
+        },
+        {
+          "flags": "--source-file <path>",
+          "description": "read the Markdown source from a file"
+        },
+        {
+          "flags": "--status <status>",
+          "description": "note status"
         }
       ]
     },
@@ -451,6 +560,98 @@
       "description": "Check connectivity and token validity against the Yuque API",
       "arguments": [],
       "options": []
+    },
+    {
+      "path": "resource create",
+      "description": "Create a structured board resource",
+      "arguments": [],
+      "options": [
+        {
+          "flags": "--doc-id <id>",
+          "description": "locate the document by id"
+        },
+        {
+          "flags": "--dsl <text>",
+          "description": "board text DSL"
+        },
+        {
+          "flags": "--dsl-file <path>",
+          "description": "read the board text DSL from a file"
+        },
+        {
+          "flags": "--insert-after-lake-id <id>",
+          "description": "insert after this top-level Lake node"
+        },
+        {
+          "flags": "--type <type>",
+          "description": "board type",
+          "choices": [
+            "mindmap",
+            "flowchart",
+            "architecturediagram"
+          ]
+        },
+        {
+          "flags": "--url <url>",
+          "description": "locate the document by URL"
+        }
+      ]
+    },
+    {
+      "path": "resource get",
+      "description": "Show a structured board resource",
+      "arguments": [
+        {
+          "name": "src",
+          "required": true,
+          "description": "raw board resource id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--doc-id <id>",
+          "description": "locate the document by id"
+        },
+        {
+          "flags": "--url <url>",
+          "description": "locate the document by URL"
+        }
+      ]
+    },
+    {
+      "path": "resource update",
+      "description": "Update a structured board resource",
+      "arguments": [
+        {
+          "name": "src",
+          "required": true,
+          "description": "raw board resource id",
+          "variadic": false
+        }
+      ],
+      "options": [
+        {
+          "flags": "--doc-id <id>",
+          "description": "locate the document by id"
+        },
+        {
+          "flags": "--dsl <json>",
+          "description": "board JSON DSL object"
+        },
+        {
+          "flags": "--dsl-file <path>",
+          "description": "read the board JSON DSL object from a file"
+        },
+        {
+          "flags": "--text <text>",
+          "description": "new board text DSL"
+        },
+        {
+          "flags": "--url <url>",
+          "description": "locate the document by URL"
+        }
+      ]
     },
     {
       "path": "search",
@@ -657,12 +858,20 @@
         {
           "flags": "--action <action>",
           "description": "operation: appendNode (append), prependNode (prepend), editNode, removeNode (required); move a node: appendNode/prependNode + --node-uuid",
-          "choices": ["appendNode", "prependNode", "editNode", "removeNode"]
+          "choices": [
+            "appendNode",
+            "prependNode",
+            "editNode",
+            "removeNode"
+          ]
         },
         {
           "flags": "--action-mode <mode>",
           "description": "operation mode: sibling or child",
-          "choices": ["sibling", "child"]
+          "choices": [
+            "sibling",
+            "child"
+          ]
         },
         {
           "flags": "--doc-id <id>",
@@ -679,7 +888,10 @@
         {
           "flags": "--open-window <n>",
           "description": "open LINK in a new window (0: same page, 1: new)",
-          "choices": ["0", "1"]
+          "choices": [
+            "0",
+            "1"
+          ]
         },
         {
           "flags": "--target-uuid <uuid>",
@@ -692,7 +904,11 @@
         {
           "flags": "--type <type>",
           "description": "node type: DOC (document), LINK, TITLE (group)",
-          "choices": ["DOC", "LINK", "TITLE"]
+          "choices": [
+            "DOC",
+            "LINK",
+            "TITLE"
+          ]
         },
         {
           "flags": "--url <url>",
@@ -701,7 +917,10 @@
         {
           "flags": "--visible <n>",
           "description": "node visibility (0: hidden, 1: visible)",
-          "choices": ["0", "1"]
+          "choices": [
+            "0",
+            "1"
+          ]
         }
       ]
     },

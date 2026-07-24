@@ -8,7 +8,7 @@
 
 [![CI][ci-image]][ci-url] [![npm version][npm-image]][npm-url] [![npm downloads][download-image]][download-url] [![License][license-image]][license-url]
 
-[快速开始](#快速开始) · [命令列表](#命令列表26-个) · [脚本化](#输出与脚本化) · [常见问题](#常见问题) · [English](./README.md)
+[快速开始](#快速开始) · [命令列表](#命令列表33-个) · [脚本化](#输出与脚本化) · [常见问题](#常见问题) · [English](./README.md)
 
 </div>
 
@@ -54,7 +54,7 @@ YUQUE_TOKEN=YOUR_TOKEN npx yuque-open-cli auth status
 
 命令行参数优先于环境变量，随手 `--token` 覆盖一次总是生效。站点地址会自动规范化（自动补 `/api/v2`）；不设置时默认 `https://www.yuque.com`。
 
-## 命令列表（26 个）
+## 命令列表（33 个）
 
 每条命令都对应[语雀 OpenAPI](https://www.yuque.com/yuque/developer/api) —— 映射关系由契约测试锁定在内置规格文件上。
 
@@ -77,6 +77,13 @@ YUQUE_TOKEN=YOUR_TOKEN npx yuque-open-cli auth status
 |            | `doc delete <book> <doc>`            | 删除文档 —— 需要确认                                               |
 |            | `doc versions <doc-id>`              | 列出文档的版本历史                                                 |
 |            | `doc version <version-id>`           | 查看某个版本的内容                                                 |
+| **小记**   | `note list`                          | 列出小记，支持 `--all` 拉取全量                                    |
+|            | `note get <id>`                      | 查看小记完整内容                                                   |
+|            | `note create`                        | 从 `--body` 或 `--body-file` 创建小记                              |
+|            | `note update <id>`                   | 更新小记源文本、HTML、摘要与状态                                   |
+| **画板**   | `resource get <src>`                 | 读取文档中的结构化画板                                             |
+|            | `resource create`                    | 创建思维导图、流程图或架构图                                       |
+|            | `resource update <src>`              | 使用文本或 JSON DSL 更新画板                                       |
 | **目录**   | `toc get <book>`                     | 以树形输出知识库目录                                               |
 |            | `toc update <book>`                  | 追加、头插、编辑或删除目录节点                                     |
 | **团队**   | `group members <login>`              | 列出团队成员                                                       |
