@@ -1,0 +1,70 @@
+name: Release
+
+# Tag-driven release: push a `vX.Y.Z` tag and this workflow runs the full
+# check gate, publishes to npm with provenance, and creates the GitHub
+# Release from the matching CHANGELOG.md section.
+#
+# One-time setup: add an npm automation token as the NPM_TOKEN repo secret
+# (Settings → Secrets and variables → Actions). Publishing fails fast with a
+# clear error if the secret is missing.
+#
+# Release steps (also documented in CONTRIBUTING.md):
+#   1. Bump `version` in package.json and add the `## X.Y.Z` CHANGELOG entry.
+#   2. Land that on main, then: git tag vX.Y.Z && git push origin vX.Y.Z
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write # create the GitHub Release
+  id-token: write # npm provenance attestation
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      # npm install, not npm ci — see ci.yml for the lockfile rationale.
+      - run: npm install --no-audit --no-fund
+      - name: Verify tag matches package.json version
+        run: |
+          pkg_version="$(node -p "require('./package.json').version")"
+          tag_version="${GITHUB_REF_NAME#v}"
+          if [ "$pkg_version" != "$tag_version" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package.json version $pkg_version" >&2
+            exit 1
+          fi
+      - name: Full check gate
+        run: npm run check
+      - name: Publish to npm (with provenance)
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN secret is not configured (Settings → Secrets and variables → Actions)" >&2
+            exit 1
+          fi
+          npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Create GitHub Release from CHANGELOG
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v ver="$version" '
+            $0 ~ "^## "ver"$" { found=1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > /tmp/release-notes.md
+          if ! [ -s /tmp/release-notes.md ]; then
+            echo "No CHANGELOG.md section found for $version" >&2
+            exit 1
+          fi
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file /tmp/release-notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/yuque/yuque-open-cli/security/advisories/new
+    about: Please report security issues privately via a security advisory, not a public issue.
+  - name: Yuque OpenAPI documentation
+    url: https://www.yuque.com/yuque/developer/api
+    about: Questions about the Yuque API itself (rather than this CLI) are answered here.
