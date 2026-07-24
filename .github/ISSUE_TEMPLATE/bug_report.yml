@@ -1,0 +1,43 @@
+name: Bug report
+description: Something in the CLI behaves incorrectly
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: CLI version
+      description: Output of `yuque --version`
+      placeholder: 1.1.0
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS and Node.js version (`node --version`)
+      placeholder: macOS 15 / Node 22.11.0
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and behavior
+      description: >-
+        The exact command you ran (redact tokens and private doc slugs), what
+        happened, and what you expected. Include the exit code (`echo $?`)
+        and output — `--json` output is especially helpful.
+      placeholder: |
+        $ yuque doc get team/handbook onboarding
+        exit code: 4
+        ...
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: >-
+        Anything else relevant — custom `--host` / space host, whether a team
+        token or personal token is used, proxy setup, etc.
+    validations:
+      required: false

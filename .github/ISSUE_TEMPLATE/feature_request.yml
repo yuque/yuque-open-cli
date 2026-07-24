@@ -1,0 +1,29 @@
+name: Feature request
+description: Propose a new command, flag, or behavior
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do that the CLI currently makes hard?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed command surface
+      description: >-
+        Sketch the command(s) as you would type them. If this maps to a Yuque
+        OpenAPI endpoint, link it — the CLI surface is spec-driven.
+      placeholder: |
+        yuque note list --all --json
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds you use today (scripts, other tools, raw curl).
+    validations:
+      required: false
