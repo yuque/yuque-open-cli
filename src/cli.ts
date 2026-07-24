@@ -16,7 +16,7 @@ const { version: VERSION } = require('../package.json') as { version: string };
 export function buildProgram(): Command {
   const program = new Command('yuque');
   program
-    .description('Yuque (语雀) from the terminal — browse, edit, and manage your knowledge base')
+    .description('Scriptable toolkit for the Yuque (语雀) Open API — search, read, write, and manage docs')
     .version(VERSION, '-v, --version', 'print the CLI version')
     .option('--token <token>', 'Yuque API token (overrides YUQUE_TOKEN / YUQUE_PERSONAL_TOKEN)')
     .option('--host <host>', 'Yuque host, e.g. https://your-space.yuque.com (overrides YUQUE_HOST)')

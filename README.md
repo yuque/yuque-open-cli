@@ -4,7 +4,7 @@
 
 <h1>Yuque CLI</h1>
 
-Your [Yuque (语雀)](https://www.yuque.com/) knowledge base in the terminal —<br>search, read, write, and manage docs from the command line.
+A scriptable toolkit for the [Yuque (语雀)](https://www.yuque.com/) Open API —<br>search, read, write, and manage docs from scripts, pipelines, and agents.
 
 [![CI][ci-image]][ci-url] [![npm version][npm-image]][npm-url] [![npm downloads][download-image]][download-url] [![License][license-image]][license-url]
 
