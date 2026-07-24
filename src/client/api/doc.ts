@@ -19,6 +19,14 @@ export interface DocListParams {
   [key: string]: unknown;
 }
 
+/** Query parameters for data-table content paging on doc detail endpoints. */
+export interface DocGetParams {
+  page?: number;
+  page_size?: number;
+  // Structural bridge to YuqueHttp's Record<string, unknown> params.
+  [key: string]: unknown;
+}
+
 /** Request body of doc create/update; create requires `body`, update sends only set fields. */
 export interface DocWritePayload {
   title?: string;
@@ -37,16 +45,26 @@ export async function listDocs(
   return res.data;
 }
 
-export async function getDoc(http: YuqueHttp, repo: BookRef, doc: string): Promise<V2DocDetail> {
+export async function getDoc(
+  http: YuqueHttp,
+  repo: BookRef,
+  doc: string,
+  params?: DocGetParams
+): Promise<V2DocDetail> {
   const res = await http.get<ApiEnvelope<V2DocDetail>>(
-    `${bookBasePath(repo)}/docs/${encodeURIComponent(doc)}`
+    `${bookBasePath(repo)}/docs/${encodeURIComponent(doc)}`,
+    params
   );
   return res.data;
 }
 
 /** Fetch a doc by its globally unique numeric id (no book needed). */
-export async function getDocById(http: YuqueHttp, id: number): Promise<V2DocDetail> {
-  const res = await http.get<ApiEnvelope<V2DocDetail>>(`/repos/docs/${id}`);
+export async function getDocById(
+  http: YuqueHttp,
+  id: number,
+  params?: DocGetParams
+): Promise<V2DocDetail> {
+  const res = await http.get<ApiEnvelope<V2DocDetail>>(`/repos/docs/${id}`, params);
   return res.data;
 }
 

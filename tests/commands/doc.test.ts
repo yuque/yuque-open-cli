@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import axios from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { runCli } from '../../src/cli.js';
 
 vi.mock('axios', async (importOriginal) => {
@@ -29,30 +29,36 @@ function ok(data: unknown) {
 
 describe('doc commands', () => {
   const request = vi.fn();
-  let stdout: ReturnType<typeof vi.spyOn>;
-  let stderr: ReturnType<typeof vi.spyOn>;
+  let stdoutChunks: string[] = [];
+  let stderrChunks: string[] = [];
 
   beforeEach(() => {
     request.mockReset();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockedAxios.create.mockReturnValue({ request } as any);
+    mockedAxios.create.mockReturnValue({ request } as unknown as AxiosInstance);
     vi.stubEnv('YUQUE_TOKEN', 'test-token');
-    stdout = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
-    stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    stdoutChunks = [];
+    stderrChunks = [];
+    vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+      stdoutChunks.push(String(chunk));
+      return true;
+    });
+    vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+      stderrChunks.push(String(chunk));
+      return true;
+    });
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
-    stdout.mockRestore();
-    stderr.mockRestore();
+    vi.restoreAllMocks();
   });
 
   function stdoutText(): string {
-    return stdout.mock.calls.map((call) => String(call[0])).join('');
+    return stdoutChunks.join('');
   }
 
   function stderrText(): string {
-    return stderr.mock.calls.map((call) => String(call[0])).join('');
+    return stderrChunks.join('');
   }
 
   describe('doc list', () => {
@@ -179,6 +185,19 @@ describe('doc commands', () => {
         data: undefined,
       });
       expect(stdoutText()).toBe('# Hello\n\nWorld.\n');
+    });
+
+    it('forwards data-table content page flags using the spec query names', async () => {
+      request.mockResolvedValueOnce(ok(detail));
+      await expect(
+        runCli(argv('doc', 'get', 'yuque/help', 'intro', '--page', '2', '--page-size', '50'))
+      ).resolves.toBe(0);
+      expect(request).toHaveBeenCalledWith({
+        method: 'get',
+        url: '/repos/yuque/help/docs/intro',
+        params: { page: 2, page_size: 50 },
+        data: undefined,
+      });
     });
 
     it('with one numeric arg GETs /repos/docs/{id}', async () => {
@@ -397,7 +416,7 @@ describe('doc commands', () => {
       expect(stdoutText()).toContain('lake');
       expect(stdoutText()).not.toContain('# v2 body');
 
-      stdout.mockClear();
+      stdoutChunks = [];
       await expect(runCli(argv('doc', 'version', '900', '--json'))).resolves.toBe(0);
       expect(JSON.parse(stdoutText())).toEqual(versionDetail);
     });

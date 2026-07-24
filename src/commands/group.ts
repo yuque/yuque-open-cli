@@ -18,12 +18,7 @@ function parseOffset(value: string): number {
 }
 
 export function registerGroupCommands(program: Command): void {
-  // runCli applies exitOverride to the root only after registration, so subcommands
-  // must opt in themselves for usage errors to surface as CommanderError (exit 2).
-  const group = program
-    .command('group')
-    .description('Manage groups (团队) and their members')
-    .exitOverride();
+  const group = program.command('group').description('Manage groups (团队) and their members');
 
   const members = group
     .command('members')
@@ -52,7 +47,7 @@ export function registerGroupCommands(program: Command): void {
       printTable<V2GroupUser>(rows, [
         { key: 'login', header: 'LOGIN', format: (m) => m.user?.login ?? '' },
         { key: 'name', header: 'NAME', format: (m) => m.user?.name ?? '' },
-        { key: 'role', header: 'ROLE', format: (m) => roleLabel(m.role) },
+        { key: 'role', header: 'ROLE', format: (m) => roleLabel(m.role as number) },
       ]);
     });
 

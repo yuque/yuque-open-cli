@@ -87,7 +87,7 @@ YUQUE_TOKEN=YOUR_TOKEN npx yuque-open-cli auth status
 |            | `stats books <login>`                | 知识库维度统计                                                     |
 |            | `stats docs <login>`                 | 文档维度统计                                                       |
 
-知识库参数在所有命令中都同时接受数字 id 和 `owner/slug` 路径。各命令的完整参数见 `yuque <命令> --help`。
+知识库参数在所有命令中都同时接受数字 id 和 `owner/slug` 路径。对于数据表文档，`doc get` 接受 `--page` 和 `--page-size` 对正文进行分页。各命令的完整参数见 `yuque <命令> --help`。
 
 ## 输出与脚本化
 
@@ -132,11 +132,11 @@ cd yuque-open-cli
 npm install
 npm test              # 单元测试
 npm run build         # 编译 TypeScript
-npm run test:e2e      # 功能测试：构建产物对着 mock 语雀 API 跑
+npm run test:e2e      # 先构建，再让产物对着 mock 语雀 API 跑功能测试
 npm run dev -- --help # 从源码运行
 ```
 
-命令面由 [tests/spec-coverage.test.ts](./tests/spec-coverage.test.ts) 锁定在 [spec/yuque-openapi.yaml](./spec/yuque-openapi.yaml) 上；`npm run check` 是合并门槛。
+命令面由 [tests/spec-coverage.test.ts](./tests/spec-coverage.test.ts) 锁定在 [spec/yuque-openapi.yaml](./spec/yuque-openapi.yaml) 上；`npm run check` 是合并门槛（依次运行 lint、格式检查、类型检查、带覆盖率门槛的单元测试、一次构建、dist 冒烟测试和功能 e2e）。
 
 ## 相关链接
 
@@ -148,7 +148,7 @@ npm run dev -- --help # 从源码运行
 
 [MIT](./LICENSE)
 
-[ci-image]: https://img.shields.io/github/actions/workflow/status/yuque/yuque-cli/ci.yml?style=flat-square&label=CI
+[ci-image]: https://img.shields.io/github/actions/workflow/status/yuque/yuque-open-cli/ci.yml?style=flat-square&label=CI
 [ci-url]: https://github.com/yuque/yuque-open-cli/actions/workflows/ci.yml
 [npm-image]: https://img.shields.io/npm/v/yuque-open-cli?style=flat-square
 [npm-url]: https://www.npmjs.com/package/yuque-open-cli

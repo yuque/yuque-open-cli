@@ -31,7 +31,7 @@ export function runYuque(args: string[], options: RunOptions = {}): Promise<RunR
   if (!existsSync(BIN)) {
     throw new Error('dist/bin.js not found — run `npm run build` before the e2e suite');
   }
-  const env: Record<string, string | undefined> = { ...process.env };
+  const env: NodeJS.ProcessEnv = { ...process.env };
   for (const key of Object.keys(env)) {
     if (key.startsWith('YUQUE_')) delete env[key];
   }
@@ -42,7 +42,7 @@ export function runYuque(args: string[], options: RunOptions = {}): Promise<RunR
 
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [BIN, ...args], {
-      env: env as NodeJS.ProcessEnv,
+      env,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
     let stdout = '';

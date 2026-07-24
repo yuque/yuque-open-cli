@@ -42,12 +42,15 @@ interface RunResult {
 
 /** Spawn the built CLI with an env overlay; undefined overrides unset the key. */
 function runCli(args: string[], overrides: Record<string, string | undefined> = {}): RunResult {
-  const env: Record<string, string | undefined> = { ...process.env, ...overrides };
-  for (const key of Object.keys(env)) if (env[key] === undefined) delete env[key];
+  const env: NodeJS.ProcessEnv = { ...process.env };
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value === undefined) delete env[key];
+    else env[key] = value;
+  }
   const result = spawnSync('node', [BIN, ...args], {
     encoding: 'utf8',
     timeout: 60000,
-    env: env as NodeJS.ProcessEnv,
+    env,
   });
   if (result.error) throw result.error;
   return { code: result.status, stdout: result.stdout ?? '', stderr: result.stderr ?? '' };
@@ -63,10 +66,23 @@ function tc(args: string[]): RunResult {
   return runCli(args, { YUQUE_TOKEN: teamToken, YUQUE_HOST: teamHost });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function okJson(res: RunResult): any {
+function okJson(res: RunResult): unknown {
   expect(res.code, `expected exit 0, got ${res.code}\nstderr: ${res.stderr}`).toBe(0);
-  return JSON.parse(res.stdout);
+  return JSON.parse(res.stdout) as unknown;
+}
+
+function isJsonObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isJsonArray(value: unknown): value is unknown[] {
+  return Array.isArray(value);
+}
+
+function okJsonObject(res: RunResult): Record<string, unknown> {
+  const value = okJson(res);
+  if (!isJsonObject(value)) throw new Error(`expected a JSON object, got ${typeof value}`);
+  return value;
 }
 
 const describeConfig = READ_ENABLED ? describe : describe.skip;
@@ -99,7 +115,7 @@ describeRead('read paths (personal token)', () => {
   let sampleDocSlug: string | undefined;
 
   beforeAll(() => {
-    const me = okJson(pc(['user', 'info', '--json']));
+    const me = okJsonObject(pc(['user', 'info', '--json']));
     // Some accounts 404 on the by-login /users/{login}/... routes (e.g. private
     // profiles) while the numeric id works, so probe login first, then fall
     // back to id. YUQUE_E2E_LOGIN pins the ref explicitly and skips the probe.
@@ -121,14 +137,14 @@ describeRead('read paths (personal token)', () => {
     ).toBeTruthy();
     if (sandboxRepo) {
       readRepo = sandboxRepo;
-    } else if (Array.isArray(repos) && (repos as unknown[]).length) {
-      const first = (repos as Array<Record<string, unknown>>)[0];
+    } else if (isJsonArray(repos) && repos.length && isJsonObject(repos[0])) {
+      const first = repos[0];
       readRepo = String(first.namespace ?? first.id);
     } else {
       // The token belongs to a dedicated, otherwise-empty test account:
       // bootstrap a sandbox Book once so the read paths have a real target.
       // Later runs discover it through the Book listing above and skip this.
-      const created = okJson(
+      const created = okJsonObject(
         pc([
           'book',
           'create',
@@ -157,7 +173,8 @@ describeRead('read paths (personal token)', () => {
       );
     }
     const docs = okJson(pc(['doc', 'list', readRepo, '--json']));
-    sampleDocSlug = Array.isArray(docs) && docs.length ? String(docs[0].slug) : undefined;
+    sampleDocSlug =
+      isJsonArray(docs) && docs.length && isJsonObject(docs[0]) ? String(docs[0].slug) : undefined;
   });
 
   it('ping exits 0', () => {
@@ -165,11 +182,11 @@ describeRead('read paths (personal token)', () => {
   });
 
   it('auth status --json reports a login', () => {
-    expect(okJson(pc(['auth', 'status', '--json'])).login).toBeTruthy();
+    expect(okJsonObject(pc(['auth', 'status', '--json'])).login).toBeTruthy();
   });
 
   it('user info --json has id and login', () => {
-    const user = okJson(pc(['user', 'info', '--json']));
+    const user = okJsonObject(pc(['user', 'info', '--json']));
     expect(user.id).toBeTruthy();
     expect(user.login).toBeTruthy();
   });
@@ -187,7 +204,7 @@ describeRead('read paths (personal token)', () => {
   });
 
   it('book get --json returns the book', () => {
-    expect(okJson(pc(['book', 'get', readRepo, '--json'])).id).toBeTruthy();
+    expect(okJsonObject(pc(['book', 'get', readRepo, '--json'])).id).toBeTruthy();
   });
 
   it('doc list --json returns an array', () => {
@@ -196,7 +213,7 @@ describeRead('read paths (personal token)', () => {
 
   it('doc get --json returns a doc', () => {
     if (!sampleDocSlug) return; // empty book — nothing to fetch, skip vacuously
-    expect(okJson(pc(['doc', 'get', readRepo, sampleDocSlug, '--json'])).id).toBeTruthy();
+    expect(okJsonObject(pc(['doc', 'get', readRepo, sampleDocSlug, '--json'])).id).toBeTruthy();
   });
 
   it('toc get --json returns an array', () => {
@@ -251,9 +268,9 @@ describeWrite('write lifecycle (sandbox repo)', () => {
   /** Delete any leftover e2e-* docs so scheduled CI never accumulates junk. */
   function sweep(): void {
     const docs = okJson(pc(['doc', 'list', repo, '--all', '--json']));
-    if (!Array.isArray(docs)) return;
+    if (!isJsonArray(docs)) return;
     for (const doc of docs) {
-      if (typeof doc.slug === 'string' && doc.slug.startsWith('e2e-')) {
+      if (isJsonObject(doc) && typeof doc.slug === 'string' && doc.slug.startsWith('e2e-')) {
         pc(['doc', 'delete', repo, String(doc.id), '--yes']);
       }
     }
@@ -267,7 +284,7 @@ describeWrite('write lifecycle (sandbox repo)', () => {
 
   it('creates, reads, updates, and deletes a doc', () => {
     const slug = `e2e-${stamp}`;
-    const created = okJson(
+    const created = okJsonObject(
       pc([
         'doc',
         'create',
@@ -285,10 +302,10 @@ describeWrite('write lifecycle (sandbox repo)', () => {
     const id = String(created.id);
     createdIds.push(id);
 
-    const fetched = okJson(pc(['doc', 'get', repo, id, '--json']));
+    const fetched = okJsonObject(pc(['doc', 'get', repo, id, '--json']));
     expect(fetched.id).toBe(created.id);
 
-    const updated = okJson(
+    const updated = okJsonObject(
       pc(['doc', 'update', repo, id, '--body', `updated at ${stamp}`, '--json'])
     );
     expect(updated.id).toBe(created.id);
@@ -306,7 +323,7 @@ describeRepoLifecycle('repo lifecycle (ephemeral repo, local only)', () => {
     expect(configuredLogin, 'YUQUE_E2E_LOGIN is required for the book lifecycle test').toBeTruthy();
     const login = configuredLogin as string;
     const stamp = `${Date.now()}`;
-    const created = okJson(
+    const created = okJsonObject(
       pc([
         'book',
         'create',
@@ -321,7 +338,7 @@ describeRepoLifecycle('repo lifecycle (ephemeral repo, local only)', () => {
     expect(created.id).toBeTruthy();
     const id = String(created.id);
     try {
-      expect(okJson(pc(['book', 'get', id, '--json'])).id).toBeTruthy();
+      expect(okJsonObject(pc(['book', 'get', id, '--json'])).id).toBeTruthy();
     } finally {
       expect(pc(['book', 'delete', id, '--yes']).code).toBe(0);
     }

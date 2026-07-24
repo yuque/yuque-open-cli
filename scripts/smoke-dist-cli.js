@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url';
 const bin = fileURLToPath(new URL('../dist/bin.js', import.meta.url));
 let failures = 0;
 
-function check(name, args, { expectCode = 0, expectStdout } = {}) {
-  const result = spawnSync('node', [bin, ...args], { encoding: 'utf8', env: { ...process.env } });
+function check(name, args, { expectCode = 0, expectStdout, env = process.env } = {}) {
+  const result = spawnSync('node', [bin, ...args], { encoding: 'utf8', env });
   const ok =
     result.status === expectCode && (!expectStdout || result.stdout.includes(expectStdout));
   if (ok) {
@@ -25,6 +25,9 @@ check('--version prints a semver', ['--version'], { expectStdout: '.' });
 check('--help shows command groups', ['--help'], { expectStdout: 'doc' });
 check('doc --help shows subcommands', ['doc', '--help'], { expectStdout: 'list' });
 check('unknown command exits 2', ['no-such-command'], { expectCode: 2 });
-check('missing token exits 3', ['user', 'info'], { expectCode: 3 });
+check('missing token exits 3', ['user', 'info'], {
+  expectCode: 3,
+  env: { ...process.env, YUQUE_TOKEN: '', YUQUE_PERSONAL_TOKEN: '' },
+});
 
 process.exit(failures === 0 ? 0 : 1);

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import axios from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { runCli } from '../../src/cli.js';
 
 vi.mock('axios', async (importOriginal) => {
@@ -26,30 +26,36 @@ function run(...args: string[]): Promise<number> {
 }
 
 describe('stats commands', () => {
-  let stdout: ReturnType<typeof vi.spyOn>;
-  let stderr: ReturnType<typeof vi.spyOn>;
+  let stdoutChunks: string[] = [];
+  let stderrChunks: string[] = [];
 
   beforeEach(() => {
     request.mockReset();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockedAxios.create.mockReturnValue({ request } as any);
+    mockedAxios.create.mockReturnValue({ request } as unknown as AxiosInstance);
     vi.stubEnv('YUQUE_TOKEN', 'test-token');
-    stdout = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
-    stderr = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    stdoutChunks = [];
+    stderrChunks = [];
+    vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+      stdoutChunks.push(String(chunk));
+      return true;
+    });
+    vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+      stderrChunks.push(String(chunk));
+      return true;
+    });
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
-    stdout.mockRestore();
-    stderr.mockRestore();
+    vi.restoreAllMocks();
   });
 
   function stdoutText(): string {
-    return stdout.mock.calls.map((call) => String(call[0])).join('');
+    return stdoutChunks.join('');
   }
 
   function stderrText(): string {
-    return stderr.mock.calls.map((call) => String(call[0])).join('');
+    return stderrChunks.join('');
   }
 
   describe('stats group', () => {
@@ -174,7 +180,10 @@ describe('stats commands', () => {
         2,
         expect.objectContaining({ params: { name: 'ann', page: 2, limit: 20 } })
       );
-      const drained = JSON.parse(stdoutText());
+      const drained = JSON.parse(stdoutText()) as unknown as {
+        members: unknown[];
+        total: number;
+      };
       expect(drained.members).toHaveLength(21);
       expect(drained.total).toBe(21);
     });

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import axios from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { runCli } from '../../src/cli.js';
 
 vi.mock('axios', async (importOriginal) => {
@@ -47,8 +47,7 @@ describe('book commands', () => {
 
   beforeEach(() => {
     request.mockReset();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockedAxios.create.mockReturnValue({ request } as any);
+    mockedAxios.create.mockReturnValue({ request } as unknown as AxiosInstance);
     vi.stubEnv('YUQUE_TOKEN', 'test-token');
     stdoutChunks = [];
     stderrChunks = [];

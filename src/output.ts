@@ -49,6 +49,12 @@ function pad(text: string, width: number): string {
   return text + ' '.repeat(Math.max(0, width - displayWidth(text)));
 }
 
+/** Preserve JavaScript's existing primitive/object string conversion for human output. */
+function stringifyValue(value: unknown): string {
+  // Object-valued table columns should supply a formatter; the fallback is intentionally "[object Object]".
+  return String(value);
+}
+
 export interface Column<T> {
   key: string;
   header: string;
@@ -59,7 +65,7 @@ function cell<T extends Record<string, unknown>>(row: T, column: Column<T>): str
   if (column.format) return column.format(row);
   const value = row[column.key];
   if (value === null || value === undefined) return '';
-  return String(value);
+  return stringifyValue(value);
 }
 
 export function printTable<T extends Record<string, unknown>>(
@@ -87,7 +93,7 @@ export function printRecord(record: Record<string, unknown>, fields: string[]): 
   const width = Math.max(0, ...present.map((field) => displayWidth(field)));
   for (const field of present) {
     const value = record[field];
-    const text = typeof value === 'object' ? JSON.stringify(value) : String(value);
+    const text = typeof value === 'object' ? JSON.stringify(value) : stringifyValue(value);
     process.stdout.write(`${dim(pad(field, width))}  ${text}\n`);
   }
 }

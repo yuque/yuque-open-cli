@@ -15,6 +15,7 @@ import {
   listDocVersions,
   listDocs,
   updateDoc,
+  type DocGetParams,
   type DocListParams,
   type DocWritePayload,
 } from '../client/api/doc.js';
@@ -47,6 +48,19 @@ function parseIntFlag(value: string | undefined, flag: string): number | undefin
     throw new UsageError(`--limit is capped at 100 by the Yuque API, got ${parsed}`);
   }
   return parsed;
+}
+
+function positiveIntFlag(flag: string, maximum?: number): (value: string) => number {
+  return (value) => {
+    if (!/^[1-9]\d*$/.test(value)) {
+      throw new UsageError(`${flag} expects a positive integer, got "${value}"`);
+    }
+    const parsed = Number(value);
+    if (maximum !== undefined && parsed > maximum) {
+      throw new UsageError(`${flag} is capped at ${maximum} by the Yuque API, got ${parsed}`);
+    }
+    return parsed;
+  };
 }
 
 interface BodyOpts {
@@ -103,12 +117,12 @@ function publicOption(): Option {
  * `body` empty, so pick by format first and fall back across the content fields.
  */
 function pickBody(detail: Partial<V2DocDetail>): string {
+  // Live responses have historically used these values even though the spec's
+  // format enum currently omits them. Keep the runtime fallback without
+  // widening the generated public type away from the spec.
+  const format: unknown = detail.format;
   const byFormat =
-    detail.format === 'sheet'
-      ? detail.body_sheet
-      : detail.format === 'table'
-        ? detail.body_table
-        : detail.body;
+    format === 'sheet' ? detail.body_sheet : format === 'table' ? detail.body_table : detail.body;
   const text = [byFormat, detail.body, detail.body_sheet, detail.body_table].find(
     (candidate) => typeof candidate === 'string' && candidate !== ''
   );
@@ -190,31 +204,54 @@ export function registerDocCommands(program: Command): void {
     .description('Show a doc: `doc get <book> <doc>` or `doc get <doc-id>`')
     .argument('<target...>', '<book> <doc slug or id>, or a single global numeric doc id')
     .option('--meta', 'print metadata instead of the body')
-    .action(async (target: string[], opts: { meta?: boolean }) => {
-      const ctx = getContext(get);
-      let detail: V2DocDetail;
-      if (target.length === 2) {
-        detail = await getDoc(ctx.http, parseBookRef(target[0]), target[1]);
-      } else if (target.length === 1) {
-        if (!/^\d+$/.test(target[0])) {
-          throw new UsageError(
-            `"${target[0]}" is not a numeric doc id — pass <book> <doc> or a global numeric doc id`
-          );
+    .option('--page <n>', 'data-table content page number', positiveIntFlag('--page'))
+    .option(
+      '--page-size <n>',
+      'data-table content page size (max 200)',
+      positiveIntFlag('--page-size', 200)
+    )
+    .action(
+      async (target: string[], opts: { meta?: boolean; page?: number; pageSize?: number }) => {
+        const params: DocGetParams = {};
+        if (opts.page !== undefined) params.page = opts.page;
+        if (opts.pageSize !== undefined) params.page_size = opts.pageSize;
+        const query = Object.keys(params).length === 0 ? undefined : params;
+
+        let bookRef: ReturnType<typeof parseBookRef> | undefined;
+        let globalDocId: number | undefined;
+        if (target.length === 2) {
+          bookRef = parseBookRef(target[0]);
+        } else if (target.length === 1) {
+          if (!/^\d+$/.test(target[0])) {
+            throw new UsageError(
+              `"${target[0]}" is not a numeric doc id — pass <book> <doc> or a global numeric doc id`
+            );
+          }
+          globalDocId = Number(target[0]);
+        } else {
+          throw new UsageError('doc get takes <book> <doc> or a single numeric <doc-id>');
         }
-        detail = await getDocById(ctx.http, Number(target[0]));
-      } else {
-        throw new UsageError('doc get takes <book> <doc> or a single numeric <doc-id>');
+
+        const ctx = getContext(get);
+        let detail: V2DocDetail;
+        if (bookRef !== undefined) {
+          detail = await getDoc(ctx.http, bookRef, target[1], query);
+        } else if (globalDocId !== undefined) {
+          detail = await getDocById(ctx.http, globalDocId, query);
+        } else {
+          throw new UsageError('doc get could not resolve the requested document');
+        }
+        if (ctx.json) {
+          printJson(detail);
+          return;
+        }
+        if (opts.meta) {
+          printRecord(detail, DOC_META_FIELDS);
+          return;
+        }
+        writeBody(detail);
       }
-      if (ctx.json) {
-        printJson(detail);
-        return;
-      }
-      if (opts.meta) {
-        printRecord(detail, DOC_META_FIELDS);
-        return;
-      }
-      writeBody(detail);
-    });
+    );
 
   const create = doc.command('create');
   create

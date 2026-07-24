@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import axios from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { YuqueHttp } from '../../src/client/http.js';
 import { YuqueError } from '../../src/errors.js';
 
@@ -40,8 +40,7 @@ describe('YuqueHttp', () => {
   beforeEach(() => {
     request.mockReset();
     sleep.mockReset();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mockedAxios.create.mockReturnValue({ request } as any);
+    mockedAxios.create.mockReturnValue({ request } as unknown as AxiosInstance);
   });
 
   function makeHttp(maxRetries = 3) {
@@ -55,12 +54,9 @@ describe('YuqueHttp', () => {
 
   it('configures baseURL with /api/v2 and the auth header', () => {
     makeHttp();
-    expect(mockedAxios.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        baseURL: 'https://www.yuque.com/api/v2',
-        headers: expect.objectContaining({ 'X-Auth-Token': 't' }),
-      })
-    );
+    const [config] = mockedAxios.create.mock.calls[0];
+    expect(config?.baseURL).toBe('https://www.yuque.com/api/v2');
+    expect(config?.headers).toMatchObject({ 'X-Auth-Token': 't' });
   });
 
   it('returns response.data on success', async () => {

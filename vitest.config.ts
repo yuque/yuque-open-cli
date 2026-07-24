@@ -12,7 +12,19 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.ts'],
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'dist/', 'tests/', 'src/client/types.ts'],
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'tests/',
+        'src/client/types.ts',
+        'src/client/types.gen.ts',
+      ],
+      thresholds: {
+        statements: 90,
+        branches: 82,
+        functions: 96,
+        lines: 91,
+      },
     },
   },
 });
