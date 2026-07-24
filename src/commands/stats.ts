@@ -50,7 +50,14 @@ const DOC_SORT_FIELDS = [
 ];
 
 const MEMBER_COLUMNS: Column<V2MemberStatistics>[] = [
-  { key: 'user', header: 'NAME', format: (row) => row.user?.name ?? String(row.user_id ?? '') },
+  {
+    key: 'user',
+    header: 'NAME',
+    // The live API returns a user object here; the vendored spec says string.
+    // Read the runtime shape without overriding the generated public field type.
+    format: (row) =>
+      (row.user as unknown as { name?: string } | undefined)?.name ?? String(row.user_id ?? ''),
+  },
   { key: 'user_id', header: 'USER ID' },
   { key: 'write_doc_count', header: 'DOCS' },
   { key: 'write_count', header: 'WRITES' },

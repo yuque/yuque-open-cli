@@ -103,12 +103,12 @@ function publicOption(): Option {
  * `body` empty, so pick by format first and fall back across the content fields.
  */
 function pickBody(detail: Partial<V2DocDetail>): string {
+  // Live responses have historically used these values even though the spec's
+  // format enum currently omits them. Keep the runtime fallback without
+  // widening the generated public type away from the spec.
+  const format: unknown = detail.format;
   const byFormat =
-    detail.format === 'sheet'
-      ? detail.body_sheet
-      : detail.format === 'table'
-        ? detail.body_table
-        : detail.body;
+    format === 'sheet' ? detail.body_sheet : format === 'table' ? detail.body_table : detail.body;
   const text = [byFormat, detail.body, detail.body_sheet, detail.body_table].find(
     (candidate) => typeof candidate === 'string' && candidate !== ''
   );

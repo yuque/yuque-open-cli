@@ -46,7 +46,8 @@ bin.ts → cli.ts (commander program, error → exit code)
 - `src/client/api/user.ts` — heartbeat, current-user, and user-groups API wrappers.
 - `src/client/book-ref.ts` — parses a book reference as a numeric id or `group/slug` and produces the encoded `/repos/...` base path.
 - `src/client/paginate.ts` — drains offset-paged endpoints for `--all` until the first short page.
-- `src/client/types.ts` — mirrors `spec/yuque-openapi.yaml`; explicit CLI fields plus index signatures preserve unmodeled fields for `--json` pass-through.
+- `src/client/types.gen.ts` — generated from `spec/yuque-openapi.yaml`; edit the spec and run `npm run gen:types`, never edit this file directly.
+- `src/client/types.ts` — thin compatibility adapter over the generated schemas; preserves public type names, live-API extensions, and index signatures for `--json` pass-through.
 - `spec/yuque-openapi.yaml` — vendored upstream OpenAPI contract and source of truth for the supported operation surface.
 - `scripts/smoke-dist-cli.js` — spawns `dist/bin.js` as an installed CLI would and checks version/help plus representative usage/auth exit codes.
 - `tests/commands/` — mocked command-action unit tests for exact requests, rendering, validation, confirmation, and exit behavior.
@@ -62,7 +63,7 @@ bin.ts → cli.ts (commander program, error → exit code)
 - Exit codes are stable and scripts may rely on them: `0 success · 1 API/unknown error · 2 usage error · 3 auth error · 4 not found · 5 rate limited` (`src/errors.ts`).
 - All HTTP goes through `src/client/http.ts`; command handlers never call axios directly.
 - Human output goes through `src/output.ts`; `--json` prints the complete unprojected payload returned by the API wrapper.
-- `npm run check` is the merge gate and matches CI: lint, format check, typecheck, coverage-enforced unit tests, one build, dist smoke, then functional e2e.
+- `npm run check` is the merge gate and matches CI: lint, format check, generated-type drift check, typecheck, coverage-enforced unit tests, one build, dist smoke, then functional e2e.
 - New or changed commands need always-on mock-server coverage in `tests/e2e/`, not only unit coverage; see `tests/e2e/README.md` for the optional real-API gates.
 
 ## Adding a command

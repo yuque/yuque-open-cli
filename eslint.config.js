@@ -5,7 +5,7 @@ const javascriptFiles = ['scripts/**/*.js', '*.config.js'];
 
 export default [
   {
-    ignores: ['coverage/', 'dist/', 'node_modules/'],
+    ignores: ['coverage/', 'dist/', 'node_modules/', 'src/client/types.gen.ts'],
   },
   ...tseslint.configs['flat/recommended-type-checked'].map((config) => ({
     ...config,

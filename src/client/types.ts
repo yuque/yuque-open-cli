@@ -1,214 +1,63 @@
+import type { components } from './types.gen.js';
+
+type GeneratedSchema<Name extends keyof components['schemas']> = components['schemas'][Name];
+
 /**
- * Domain types mirroring spec/yuque-openapi.yaml component schemas.
- * Fields used by the CLI are typed explicitly; everything else flows through
- * the index signature so --json output always carries the full payload.
+ * Yuque may add response fields before they appear in the vendored spec.
+ * Keeping an open index preserves the complete payload for `--json` and the
+ * compatibility contract of the former handwritten public types.
  */
+type JsonPassthrough = { [key: string]: unknown };
 
-export interface ApiEnvelope<T> {
-  data: T;
-  [key: string]: unknown;
-}
+type PublicSchema<Name extends keyof components['schemas']> = GeneratedSchema<Name> &
+  JsonPassthrough;
 
-export interface V2User {
-  id: number;
-  type?: string;
-  login: string;
-  name: string;
-  avatar_url?: string;
-  books_count?: number;
-  public_books_count?: number;
-  followers_count?: number;
-  following_count?: number;
-  public?: number;
-  description?: string | null;
-  created_at?: string;
-  updated_at?: string;
-  [key: string]: unknown;
-}
+type PublicSchemaWith<Name extends keyof components['schemas'], Relations> = Omit<
+  GeneratedSchema<Name>,
+  keyof Relations
+> &
+  Relations &
+  JsonPassthrough;
 
-export interface V2Group {
-  id: number;
-  type?: string;
-  login: string;
-  name: string;
-  avatar_url?: string;
-  books_count?: number;
-  public_books_count?: number;
-  members_count?: number;
-  public?: number;
-  description?: string | null;
-  created_at?: string;
-  updated_at?: string;
-  [key: string]: unknown;
-}
+/**
+ * API response envelopes are defined inline throughout the OpenAPI paths, so
+ * this generic compatibility helper cannot be extracted from one component.
+ */
+export type ApiEnvelope<T> = { data: T } & JsonPassthrough;
 
-export interface V2GroupUser {
-  id: number;
-  group_id?: number;
-  user_id?: number;
-  role: number;
-  created_at?: string;
-  updated_at?: string;
-  group?: V2Group;
-  user?: V2User;
-  [key: string]: unknown;
-}
+export type V2User = PublicSchema<'V2User'>;
+export type V2Group = PublicSchema<'V2Group'>;
+export type V2GroupUser = PublicSchemaWith<'V2GroupUser', { group?: V2Group; user?: V2User }>;
+export type V2Book = PublicSchemaWith<'V2Book', { user?: V2User }>;
+export type V2BookDetail = PublicSchemaWith<'V2BookDetail', { user?: V2User }>;
+export type V2Doc = PublicSchemaWith<
+  'V2Doc',
+  { book?: V2Book; last_editor?: V2User; user?: V2User }
+>;
+export type V2SearchResult = PublicSchemaWith<'V2SearchResult', { target?: V2Book | V2Doc }>;
 
-export interface V2SearchResult {
-  id: number;
-  type: string;
-  title: string;
-  summary?: string;
-  url: string;
-  info?: string;
-  target?: Record<string, unknown>;
-  [key: string]: unknown;
-}
-
-export interface V2Book {
-  id: number;
-  type?: string;
-  slug: string;
-  name: string;
-  user_id?: number;
-  description?: string | null;
-  creator_id?: number;
-  public?: number;
-  items_count?: number;
-  likes_count?: number;
-  watches_count?: number;
-  content_updated_at?: string;
-  created_at?: string;
-  updated_at?: string;
-  user?: V2User;
-  namespace?: string;
-  [key: string]: unknown;
-}
-
-export interface V2BookDetail extends V2Book {
-  toc_yml?: string;
-  [key: string]: unknown;
-}
-
-export interface V2Doc {
-  id: number;
-  type?: string;
-  slug: string;
-  title: string;
-  description?: string | null;
-  user_id?: number;
-  book_id?: number;
-  last_editor_id?: number;
-  public?: number;
-  status?: number;
-  likes_count?: number;
-  read_count?: number;
-  word_count?: number;
-  created_at?: string;
-  updated_at?: string;
-  content_updated_at?: string;
-  published_at?: string;
-  first_published_at?: string;
-  user?: V2User;
+interface V2DocDetailExtensions {
+  /**
+   * Source: the pre-generation handwritten public contract. The sibling V2Doc
+   * schema declares the same last-editor object, while the vendored
+   * V2DocDetail schema currently omits it.
+   */
   last_editor?: V2User;
-  book?: V2Book;
-  [key: string]: unknown;
 }
 
-export interface V2DocDetail extends V2Doc {
-  format?: string;
-  body?: string;
-  body_draft?: string;
-  body_html?: string;
-  body_lake?: string;
-  body_sheet?: string;
-  body_table?: string;
-  creator?: V2User;
-  [key: string]: unknown;
-}
+export type V2DocDetail = PublicSchemaWith<
+  'V2DocDetail',
+  {
+    book?: V2Book;
+    creator?: V2User;
+    user?: V2User;
+  } & V2DocDetailExtensions
+>;
 
-export interface V2DocVersion {
-  id: number;
-  doc_id: number;
-  slug?: string;
-  title: string;
-  user_id?: number;
-  created_at?: string;
-  updated_at?: string;
-  user?: V2User;
-  [key: string]: unknown;
-}
-
-export interface V2DocVersionDetail extends V2DocVersion {
-  format?: string;
-  body?: string;
-  body_html?: string;
-  body_md?: string;
-  body_asl?: string;
-  diff?: string;
-  [key: string]: unknown;
-}
-
-export interface V2TocItem {
-  uuid: string;
-  type: string;
-  title: string;
-  url?: string;
-  slug?: string;
-  id?: number;
-  doc_id?: number;
-  level?: number;
-  depth?: number;
-  open_window?: number;
-  visible?: number;
-  prev_uuid?: string;
-  sibling_uuid?: string;
-  child_uuid?: string;
-  parent_uuid?: string;
-  [key: string]: unknown;
-}
-
-export interface V2GroupStatistics {
-  bizdate?: string;
-  member_count?: number;
-  write_count?: number;
-  read_count?: number;
-  comment_count?: number;
-  [key: string]: unknown;
-}
-
-export interface V2MemberStatistics {
-  bizdate?: string;
-  user_id?: number;
-  write_count?: number;
-  write_doc_count?: number;
-  read_count?: number;
-  like_count?: number;
-  user?: V2User;
-  [key: string]: unknown;
-}
-
-export interface V2BookStatistics {
-  bizdate?: string;
-  book_id?: number;
-  slug?: string;
-  name?: string;
-  post_count?: number;
-  word_count?: number;
-  read_count?: number;
-  like_count?: number;
-  [key: string]: unknown;
-}
-
-export interface V2DocStatistics {
-  bizdate?: string;
-  book_id?: number;
-  doc_id?: number;
-  slug?: string;
-  title?: string;
-  read_count?: number;
-  like_count?: number;
-  comment_count?: number;
-  word_count?: number;
-  [key: string]: unknown;
-}
+export type V2DocVersion = PublicSchemaWith<'V2DocVersion', { user?: V2User }>;
+export type V2DocVersionDetail = PublicSchemaWith<'V2DocVersionDetail', { user?: V2User }>;
+export type V2TocItem = PublicSchema<'V2TocItem'>;
+export type V2GroupStatistics = PublicSchema<'V2GroupStatistics'>;
+export type V2MemberStatistics = PublicSchema<'V2MemberStatistics'>;
+export type V2BookStatistics = PublicSchema<'V2BookStatistics'>;
+export type V2DocStatistics = PublicSchema<'V2DocStatistics'>;

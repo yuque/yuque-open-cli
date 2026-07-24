@@ -47,7 +47,7 @@ export function registerGroupCommands(program: Command): void {
       printTable<V2GroupUser>(rows, [
         { key: 'login', header: 'LOGIN', format: (m) => m.user?.login ?? '' },
         { key: 'name', header: 'NAME', format: (m) => m.user?.name ?? '' },
-        { key: 'role', header: 'ROLE', format: (m) => roleLabel(m.role) },
+        { key: 'role', header: 'ROLE', format: (m) => roleLabel(m.role as number) },
       ]);
     });
 
