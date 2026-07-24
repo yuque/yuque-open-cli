@@ -42,6 +42,13 @@ const EXPECTED_LEAF_COMMANDS = [
   'stats members',
   'stats books',
   'stats docs',
+  'note list',
+  'note get',
+  'note create',
+  'note update',
+  'resource get',
+  'resource create',
+  'resource update',
 ].sort();
 
 function collectLeafCommands(command: Command, prefix: string[] = []): string[] {
@@ -63,8 +70,8 @@ describe('spec coverage contract', () => {
   const { operations, missingOperationIds } = loadSpecOperations();
   const registeredLeaves = collectLeafCommands(buildProgram()).sort();
 
-  it('pins the spec identity (38 operations)', () => {
-    expect(operations).toHaveLength(38);
+  it('pins the spec identity (45 operations)', () => {
+    expect(operations).toHaveLength(45);
   });
 
   it('has no spec operation without an operationId', () => {

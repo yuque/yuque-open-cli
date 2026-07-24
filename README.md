@@ -8,7 +8,7 @@ A scriptable toolkit for the [Yuque (语雀)](https://www.yuque.com/) Open API �
 
 [![CI][ci-image]][ci-url] [![npm version][npm-image]][npm-url] [![npm downloads][download-image]][download-url] [![License][license-image]][license-url]
 
-[Quick Start](#quick-start) · [Commands](#commands-26) · [Scripting](#output--scripting) · [Troubleshooting](#troubleshooting) · [中文文档](./README.zh-CN.md)
+[Quick Start](#quick-start) · [Commands](#commands-33) · [Scripting](#output--scripting) · [Troubleshooting](#troubleshooting) · [中文文档](./README.zh-CN.md)
 
 </div>
 
@@ -54,7 +54,7 @@ YUQUE_TOKEN=YOUR_TOKEN npx yuque-open-cli auth status
 
 Flags win over env vars, so a one-off `--token` override always works. Site roots are normalized (`/api/v2` is appended automatically); when unset, the host defaults to `https://www.yuque.com`.
 
-## Commands (26)
+## Commands (33)
 
 Each command maps to the [Yuque OpenAPI](https://www.yuque.com/yuque/developer/api) — the mapping is locked by a contract test against the vendored spec.
 
@@ -77,6 +77,13 @@ Each command maps to the [Yuque OpenAPI](https://www.yuque.com/yuque/developer/a
 |            | `doc delete <book> <doc>`            | Delete a doc — asks for confirmation                                               |
 |            | `doc versions <doc-id>`              | List a doc's version history                                                       |
 |            | `doc version <version-id>`           | Show one version's content                                                         |
+| **Notes**  | `note list`                          | List notes (小记), with `--all` support                                            |
+|            | `note get <id>`                      | Show a note with its full content                                                  |
+|            | `note create`                        | Create a note from `--body` or `--body-file`                                       |
+|            | `note update <id>`                   | Update note source, HTML, abstract, and status                                     |
+| **Boards** | `resource get <src>`                 | Read a structured board from a document                                            |
+|            | `resource create`                    | Create a mind map, flowchart, or architecture diagram                             |
+|            | `resource update <src>`              | Update a board from text or JSON DSL                                               |
 | **TOC**    | `toc get <book>`                     | Print a book's table of contents as a tree                                         |
 |            | `toc update <book>`                  | Append, prepend, edit, or remove a TOC node                                        |
 | **Groups** | `group members <login>`              | List members of a group                                                            |

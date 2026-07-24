@@ -736,6 +736,164 @@ const CONSTRAINT_PINS: Record<string, ConstraintPin[]> = {
       cli: flagCli('stats docs', '--sort-order', ['stats', 'docs', 'team'], 'params', 'sortOrder'),
     },
   ],
+  note_api_v2_note_list: [
+    {
+      in: 'query',
+      param: 'page',
+      minimum: 1,
+      cli: flagCli('note list', '--page', ['note', 'list'], 'params', 'page'),
+    },
+    {
+      in: 'query',
+      param: 'limit',
+      minimum: 1,
+      cli: flagCli('note list', '--limit', ['note', 'list'], 'params', 'limit'),
+    },
+  ],
+  note_api_v2_note_create: [
+    {
+      in: 'body',
+      param: 'body',
+      required: true,
+      cli: flagCli('note create', '--body', ['note', 'create'], 'data', 'body'),
+      cliAlternativeFlags: ['--body-file'],
+    },
+  ],
+  note_api_v2_note_show: [],
+  note_api_v2_note_update: [
+    {
+      in: 'body',
+      param: 'source',
+      required: true,
+      cli: flagCli(
+        'note update',
+        '--source',
+        ['note', 'update', '1', '--html', '<p>x</p>', '--abstract', 'x'],
+        'data',
+        'source'
+      ),
+      cliAlternativeFlags: ['--source-file'],
+    },
+    {
+      in: 'body',
+      param: 'html',
+      required: true,
+      cli: flagCli(
+        'note update',
+        '--html',
+        ['note', 'update', '1', '--source', 'x', '--abstract', 'x'],
+        'data',
+        'html'
+      ),
+    },
+    {
+      in: 'body',
+      param: 'abstract',
+      required: true,
+      cli: flagCli(
+        'note update',
+        '--abstract',
+        ['note', 'update', '1', '--source', 'x', '--html', '<p>x</p>'],
+        'data',
+        'abstract'
+      ),
+    },
+  ],
+  resource_api_v2_board_show: [
+    {
+      in: 'query',
+      param: 'resource_type',
+      required: true,
+      enum: ['board'],
+      cli: null,
+    },
+    {
+      in: 'query',
+      param: 'src',
+      required: true,
+      cli: argumentCli(
+        'resource get',
+        '<src>',
+        ['resource', 'get'],
+        ['--doc-id', '1'],
+        'params',
+        'src'
+      ),
+    },
+    {
+      in: 'query',
+      param: 'doc_id',
+      minimum: 1,
+      cli: flagCli('resource get', '--doc-id', ['resource', 'get', 'raw-id'], 'params', 'doc_id'),
+    },
+  ],
+  resource_api_v2_board_create: [
+    {
+      in: 'body',
+      param: 'type',
+      required: true,
+      enum: ['mindmap', 'flowchart', 'architecturediagram'],
+      cli: flagCli(
+        'resource create',
+        '--type',
+        ['resource', 'create', '--doc-id', '1', '--dsl', 'root'],
+        'data',
+        'type'
+      ),
+    },
+    {
+      in: 'body',
+      param: 'dsl',
+      required: true,
+      cli: flagCli(
+        'resource create',
+        '--dsl',
+        ['resource', 'create', '--doc-id', '1', '--type', 'mindmap'],
+        'data',
+        'dsl'
+      ),
+      cliAlternativeFlags: ['--dsl-file'],
+    },
+    {
+      in: 'body',
+      param: 'doc_id',
+      minimum: 1,
+      cli: flagCli(
+        'resource create',
+        '--doc-id',
+        ['resource', 'create', '--type', 'mindmap', '--dsl', 'root'],
+        'data',
+        'doc_id'
+      ),
+    },
+  ],
+  resource_api_v2_board_update: [
+    {
+      in: 'body',
+      param: 'src',
+      required: true,
+      cli: argumentCli(
+        'resource update',
+        '<src>',
+        ['resource', 'update'],
+        ['--doc-id', '1', '--text', 'root'],
+        'data',
+        'src'
+      ),
+    },
+    {
+      in: 'body',
+      param: 'doc_id',
+      minimum: 1,
+      cli: flagCli(
+        'resource update',
+        '--doc-id',
+        ['resource', 'update', 'raw-id', '--text', 'root'],
+        'data',
+        'doc_id'
+      ),
+    },
+  ],
 };
 
 function isObject(value: unknown): value is OpenApiObject {
@@ -919,9 +1077,16 @@ describe('spec parameter constraints contract', () => {
   describe('CLI boundary alignment', () => {
     beforeEach(() => {
       request.mockReset();
-      request.mockImplementation((config: { url?: string }) =>
-        Promise.resolve({ data: { data: successData(config.url) } })
-      );
+      request.mockImplementation((config: { method?: string; url?: string }) => {
+        const data = successData(config.url);
+        if (config.method === 'put' && config.url?.startsWith('/notes/')) {
+          return Promise.resolve({ data: { data: { data } } });
+        }
+        if (config.method === 'post' && config.url === '/notes') {
+          return Promise.resolve({ data: { success: true, data } });
+        }
+        return Promise.resolve({ data: { data } });
+      });
       mockedAxios.create.mockReset();
       mockedAxios.create.mockReturnValue({ request } as unknown as AxiosInstance);
       vi.stubEnv('YUQUE_TOKEN', 'test-token');

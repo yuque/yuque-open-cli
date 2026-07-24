@@ -2178,6 +2178,208 @@ components:
         user:
           type: string
           description: 附件数量
+    V2NoteContent:
+      type: object
+      properties:
+        updated_at:
+          type: string
+          format: date-time
+          description: 内容更新时间
+        abstract:
+          type: string
+          description: 内容摘要
+        format:
+          type: string
+          description: 内容格式
+        source:
+          type: string
+          description: Markdown 源文本
+        html:
+          type: string
+          description: HTML 内容
+        draft_version:
+          type: integer
+          description: 草稿版本
+        doc_dynamic_data:
+          type: array
+          description: 动态内容数据
+          items: {}
+    V2Note:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 小记 ID
+        slug:
+          type: string
+          description: 小记路径
+        doclet_id:
+          type: integer
+          format: int64
+          description: Doclet ID
+        user_id:
+          type: integer
+          format: int64
+          description: 用户 ID
+        content:
+          $ref: '#/components/schemas/V2NoteContent'
+        published_at:
+          type: string
+          format: date-time
+          description: 发布时间
+        created_at:
+          type: string
+          format: date-time
+          description: 创建时间
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新时间
+        deleted_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: 删除时间
+        pinned_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: 置顶时间
+        status:
+          type: integer
+          description: 小记状态
+        save_from:
+          type:
+            - string
+            - 'null'
+          description: 保存来源
+        public:
+          type: integer
+          description: 公开性
+        likes_count:
+          type: integer
+          description: 点赞数
+        comments_count:
+          type: integer
+          description: 评论数
+        has_image:
+          type: boolean
+          description: 是否包含图片
+        has_attachment:
+          type: boolean
+          description: 是否包含附件
+        has_bookmark:
+          type: boolean
+          description: 是否包含书签
+        word_count:
+          type: integer
+          description: 字数
+        tags:
+          type: array
+          description: 标签
+          items:
+            type: string
+        share_expired_time:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: 分享过期时间
+    V2NoteListResult:
+      type: object
+      properties:
+        pin_notes:
+          type: array
+          description: 置顶小记
+          items:
+            $ref: '#/components/schemas/V2Note'
+        notes:
+          type: array
+          description: 普通小记
+          items:
+            $ref: '#/components/schemas/V2Note'
+        has_more:
+          type: boolean
+          description: 是否还有下一页
+    V2NoteCreateResult:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: 小记 ID
+        slug:
+          type: string
+          description: 小记路径
+        note_url:
+          type: string
+          description: 小记访问地址
+    V2ResourceResult:
+      type: object
+      properties:
+        doc_id:
+          type: integer
+          format: int64
+          description: 文档 ID
+        title:
+          type: string
+          description: 文档标题
+        url:
+          type: string
+          description: 文档访问地址
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新时间
+        board:
+          type: object
+          properties:
+            page_ref:
+              type: object
+              properties:
+                src:
+                  type: string
+                  description: 画板资源 ID
+            resource:
+              type: object
+              properties:
+                id:
+                  type:
+                    - string
+                    - 'null'
+                  description: 资源 ID
+                kind:
+                  type: string
+                  description: 资源类型
+            dsl:
+              type: object
+              description: 画板 JSON DSL
+              additionalProperties: true
+            summary:
+              type: object
+              properties:
+                cell_count:
+                  type: integer
+                  description: 单元格数量
+                type_counts:
+                  type: object
+                  description: 按类型统计
+                  additionalProperties:
+                    type: integer
+                shape_counts:
+                  type: object
+                  description: 按形状统计
+                  additionalProperties:
+                    type: integer
+                has_viewport:
+                  type: boolean
+                  description: 是否包含视口
+                has_search:
+                  type: boolean
+                  description: 是否包含搜索
 security:
   - authToken: []
 paths:
@@ -4389,6 +4591,413 @@ paths:
         '422': *ref_4
         '429': *ref_5
         '500': *ref_6
+  /api/v2/notes:
+    get:
+      tags:
+        - note
+      summary: 获取当前用户的小记列表
+      operationId: note_api_v2_note_list
+      description: |-
+        获取当前用户的小记列表
+        GET /api/v2/notes
+      parameters:
+        - name: status
+          in: query
+          description: 小记状态
+          required: false
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: 页码
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: 每页数量
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/V2NoteListResult'
+        '400': *ref_0
+        '401': *ref_1
+        '403': *ref_2
+        '404': *ref_3
+        '422': *ref_4
+        '429': *ref_5
+        '500': *ref_6
+    post:
+      tags:
+        - note
+      summary: 创建小记
+      operationId: note_api_v2_note_create
+      description: |-
+        创建小记
+        POST /api/v2/notes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - body
+              properties:
+                body:
+                  type: string
+                  description: Markdown 正文
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - data
+                properties:
+                  success:
+                    type: boolean
+                    description: 是否创建成功
+                  data:
+                    $ref: '#/components/schemas/V2NoteCreateResult'
+        '400': *ref_0
+        '401': *ref_1
+        '403': *ref_2
+        '404': *ref_3
+        '422': *ref_4
+        '429': *ref_5
+        '500': *ref_6
+  /api/v2/notes/{id}:
+    get:
+      tags:
+        - note
+      summary: 获取小记详情
+      operationId: note_api_v2_note_show
+      description: |-
+        获取小记详情
+        GET /api/v2/notes/:id
+      parameters:
+        - name: id
+          in: path
+          description: 小记 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/V2Note'
+        '400': *ref_0
+        '401': *ref_1
+        '403': *ref_2
+        '404': *ref_3
+        '422': *ref_4
+        '429': *ref_5
+        '500': *ref_6
+    put:
+      tags:
+        - note
+      summary: 更新小记
+      operationId: note_api_v2_note_update
+      description: |-
+        更新小记
+        PUT /api/v2/notes/:id
+
+        注意：响应体是双层信封 `{ data: { data: Note } }`。
+      parameters:
+        - name: id
+          in: path
+          description: 小记 ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - source
+                - html
+                - abstract
+              properties:
+                source:
+                  type: string
+                  description: Markdown 源文本
+                html:
+                  type: string
+                  description: HTML 内容
+                abstract:
+                  type: string
+                  description: 内容摘要
+                status:
+                  type: integer
+                  description: 小记状态
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - data
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/V2Note'
+        '400': *ref_0
+        '401': *ref_1
+        '403': *ref_2
+        '404': *ref_3
+        '422': *ref_4
+        '429': *ref_5
+        '500': *ref_6
+  /api/v2/yfm/boards:
+    get:
+      tags:
+        - resource
+      summary: 获取文档中的结构化画板
+      operationId: resource_api_v2_board_show
+      description: |-
+        获取文档中的结构化画板
+        GET /api/v2/yfm/boards
+
+        doc_id 与 url 必须且只能提供一个。
+      parameters:
+        - name: resource_type
+          in: query
+          description: 资源类型，目前只支持 board
+          required: true
+          schema:
+            type: string
+            enum:
+              - board
+        - name: src
+          in: query
+          description: 原始画板资源 ID
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: doc_id
+          in: query
+          description: 文档 ID，与 url 二选一
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: url
+          in: query
+          description: 文档 URL，与 doc_id 二选一
+          required: false
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/V2ResourceResult'
+        '400': *ref_0
+        '401': *ref_1
+        '403': *ref_2
+        '404': *ref_3
+        '422': *ref_4
+        '429': *ref_5
+        '500': *ref_6
+    post:
+      tags:
+        - resource
+      summary: 在文档中创建结构化画板
+      operationId: resource_api_v2_board_create
+      description: |-
+        在文档中创建结构化画板
+        POST /api/v2/yfm/boards
+
+        doc_id 与 url 必须且只能提供一个。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - dsl
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - mindmap
+                    - flowchart
+                    - architecturediagram
+                  description: 画板类型
+                dsl:
+                  type: string
+                  description: 画板文本 DSL
+                doc_id:
+                  type: integer
+                  minimum: 1
+                  description: 文档 ID，与 url 二选一
+                url:
+                  type: string
+                  minLength: 1
+                  description: 文档 URL，与 doc_id 二选一
+                insert_after_lake_id:
+                  type: string
+                  minLength: 1
+                  description: 插入到指定顶层 Lake 节点之后
+              oneOf:
+                - required:
+                    - doc_id
+                  not:
+                    required:
+                      - url
+                - required:
+                    - url
+                  not:
+                    required:
+                      - doc_id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/V2ResourceResult'
+        '400': *ref_0
+        '401': *ref_1
+        '403': *ref_2
+        '404': *ref_3
+        '422': *ref_4
+        '429': *ref_5
+        '500': *ref_6
+    put:
+      tags:
+        - resource
+      summary: 更新文档中的结构化画板
+      operationId: resource_api_v2_board_update
+      description: |-
+        更新文档中的结构化画板
+        PUT /api/v2/yfm/boards
+
+        doc_id 与 url 必须且只能提供一个；text 与 dsl 必须且只能提供一个。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - src
+              properties:
+                src:
+                  type: string
+                  minLength: 1
+                  description: 原始画板资源 ID
+                doc_id:
+                  type: integer
+                  minimum: 1
+                  description: 文档 ID，与 url 二选一
+                url:
+                  type: string
+                  minLength: 1
+                  description: 文档 URL，与 doc_id 二选一
+                text:
+                  type: string
+                  description: 新的画板文本 DSL
+                dsl:
+                  type: object
+                  description: 画板 JSON DSL
+                  additionalProperties: true
+              allOf:
+                - oneOf:
+                    - required:
+                        - doc_id
+                      not:
+                        required:
+                          - url
+                    - required:
+                        - url
+                      not:
+                        required:
+                          - doc_id
+                - oneOf:
+                    - required:
+                        - text
+                      not:
+                        required:
+                          - dsl
+                    - required:
+                        - dsl
+                      not:
+                        required:
+                          - text
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/V2ResourceResult'
+        '400': *ref_0
+        '401': *ref_1
+        '403': *ref_2
+        '404': *ref_3
+        '422': *ref_4
+        '429': *ref_5
+        '500': *ref_6
 tags:
   - name: user
     description: user
@@ -4402,3 +5011,7 @@ tags:
     description: repo
   - name: statistic
     description: statistic
+  - name: note
+    description: note
+  - name: resource
+    description: resource

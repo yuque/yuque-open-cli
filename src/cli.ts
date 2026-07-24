@@ -9,6 +9,8 @@ import { registerDocCommands } from './commands/doc.js';
 import { registerTocCommands } from './commands/toc.js';
 import { registerGroupCommands } from './commands/group.js';
 import { registerStatsCommands } from './commands/stats.js';
+import { registerNoteCommands } from './commands/note.js';
+import { registerResourceCommands } from './commands/resource.js';
 
 const require = createRequire(import.meta.url);
 const { version: VERSION } = require('../package.json') as { version: string };
@@ -41,6 +43,8 @@ export function buildProgram(): Command {
   registerTocCommands(program);
   registerGroupCommands(program);
   registerStatsCommands(program);
+  registerNoteCommands(program);
+  registerResourceCommands(program);
   return program;
 }
 

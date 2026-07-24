@@ -706,6 +706,97 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 获取当前用户的小记列表
+         * @description 获取当前用户的小记列表
+         *     GET /api/v2/notes
+         */
+        get: operations["note_api_v2_note_list"];
+        put?: never;
+        /**
+         * 创建小记
+         * @description 创建小记
+         *     POST /api/v2/notes
+         */
+        post: operations["note_api_v2_note_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/notes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 获取小记详情
+         * @description 获取小记详情
+         *     GET /api/v2/notes/:id
+         */
+        get: operations["note_api_v2_note_show"];
+        /**
+         * 更新小记
+         * @description 更新小记
+         *     PUT /api/v2/notes/:id
+         *
+         *     注意：响应体是双层信封 `{ data: { data: Note } }`。
+         */
+        put: operations["note_api_v2_note_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/yfm/boards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * 获取文档中的结构化画板
+         * @description 获取文档中的结构化画板
+         *     GET /api/v2/yfm/boards
+         *
+         *     doc_id 与 url 必须且只能提供一个。
+         */
+        get: operations["resource_api_v2_board_show"];
+        /**
+         * 更新文档中的结构化画板
+         * @description 更新文档中的结构化画板
+         *     PUT /api/v2/yfm/boards
+         *
+         *     doc_id 与 url 必须且只能提供一个；text 与 dsl 必须且只能提供一个。
+         */
+        put: operations["resource_api_v2_board_update"];
+        /**
+         * 在文档中创建结构化画板
+         * @description 在文档中创建结构化画板
+         *     POST /api/v2/yfm/boards
+         *
+         *     doc_id 与 url 必须且只能提供一个。
+         */
+        post: operations["resource_api_v2_board_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1798,6 +1889,162 @@ export interface components {
             /** @description 附件数量 */
             user?: string;
         };
+        V2NoteContent: {
+            /**
+             * Format: date-time
+             * @description 内容更新时间
+             */
+            updated_at?: string;
+            /** @description 内容摘要 */
+            abstract?: string;
+            /** @description 内容格式 */
+            format?: string;
+            /** @description Markdown 源文本 */
+            source?: string;
+            /** @description HTML 内容 */
+            html?: string;
+            /** @description 草稿版本 */
+            draft_version?: number;
+            /** @description 动态内容数据 */
+            doc_dynamic_data?: unknown[];
+        };
+        V2Note: {
+            /**
+             * Format: int64
+             * @description 小记 ID
+             */
+            id?: number;
+            /** @description 小记路径 */
+            slug?: string;
+            /**
+             * Format: int64
+             * @description Doclet ID
+             */
+            doclet_id?: number;
+            /**
+             * Format: int64
+             * @description 用户 ID
+             */
+            user_id?: number;
+            content?: components["schemas"]["V2NoteContent"];
+            /**
+             * Format: date-time
+             * @description 发布时间
+             */
+            published_at?: string;
+            /**
+             * Format: date-time
+             * @description 创建时间
+             */
+            created_at?: string;
+            /**
+             * Format: date-time
+             * @description 更新时间
+             */
+            updated_at?: string;
+            /**
+             * Format: date-time
+             * @description 删除时间
+             */
+            deleted_at?: string | null;
+            /**
+             * Format: date-time
+             * @description 置顶时间
+             */
+            pinned_at?: string | null;
+            /** @description 小记状态 */
+            status?: number;
+            /** @description 保存来源 */
+            save_from?: string | null;
+            /** @description 公开性 */
+            public?: number;
+            /** @description 点赞数 */
+            likes_count?: number;
+            /** @description 评论数 */
+            comments_count?: number;
+            /** @description 是否包含图片 */
+            has_image?: boolean;
+            /** @description 是否包含附件 */
+            has_attachment?: boolean;
+            /** @description 是否包含书签 */
+            has_bookmark?: boolean;
+            /** @description 字数 */
+            word_count?: number;
+            /** @description 标签 */
+            tags?: string[];
+            /**
+             * Format: date-time
+             * @description 分享过期时间
+             */
+            share_expired_time?: string | null;
+        };
+        V2NoteListResult: {
+            /** @description 置顶小记 */
+            pin_notes?: components["schemas"]["V2Note"][];
+            /** @description 普通小记 */
+            notes?: components["schemas"]["V2Note"][];
+            /** @description 是否还有下一页 */
+            has_more?: boolean;
+        };
+        V2NoteCreateResult: {
+            /**
+             * Format: int64
+             * @description 小记 ID
+             */
+            id?: number;
+            /** @description 小记路径 */
+            slug?: string;
+            /** @description 小记访问地址 */
+            note_url?: string;
+        };
+        V2ResourceResult: {
+            /**
+             * Format: int64
+             * @description 文档 ID
+             */
+            doc_id?: number;
+            /** @description 文档标题 */
+            title?: string;
+            /** @description 文档访问地址 */
+            url?: string;
+            /**
+             * Format: date-time
+             * @description 更新时间
+             */
+            updated_at?: string;
+            board?: {
+                page_ref?: {
+                    /** @description 画板资源 ID */
+                    src?: string;
+                };
+                resource?: {
+                    /** @description 资源 ID */
+                    id?: string | null;
+                    /** @description 资源类型 */
+                    kind?: string;
+                };
+                /** @description 画板 JSON DSL */
+                dsl?: {
+                    [key: string]: unknown;
+                };
+                summary?: {
+                    /** @description 单元格数量 */
+                    cell_count?: number;
+                    /** @description 按类型统计 */
+                    type_counts?: {
+                        [key: string]: number;
+                    };
+                    /** @description 按形状统计 */
+                    shape_counts?: {
+                        [key: string]: number;
+                    };
+                    /** @description 是否包含视口 */
+                    has_viewport?: boolean;
+                    /** @description 是否包含搜索 */
+                    has_search?: boolean;
+                };
+            };
+        };
     };
     responses: {
         /** @description 请求参数非法 */
@@ -2263,6 +2510,11 @@ export type V2GroupStatistics = components['schemas']['V2GroupStatistics'];
 export type V2MemberStatistics = components['schemas']['V2MemberStatistics'];
 export type V2BookStatistics = components['schemas']['V2BookStatistics'];
 export type V2DocStatistics = components['schemas']['V2DocStatistics'];
+export type V2NoteContent = components['schemas']['V2NoteContent'];
+export type V2Note = components['schemas']['V2Note'];
+export type V2NoteListResult = components['schemas']['V2NoteListResult'];
+export type V2NoteCreateResult = components['schemas']['V2NoteCreateResult'];
+export type V2ResourceResult = components['schemas']['V2ResourceResult'];
 export type Response400 = components['responses']['400'];
 export type Response401 = components['responses']['401'];
 export type Response403 = components['responses']['403'];
@@ -3747,6 +3999,290 @@ export interface operations {
                             /** @description 总数量 */
                             total?: number;
                         };
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+            429: components["responses"]["429"];
+            500: components["responses"]["500"];
+        };
+    };
+    note_api_v2_note_list: {
+        parameters: {
+            query?: {
+                /** @description 小记状态 */
+                status?: number;
+                /** @description 页码 */
+                page?: number;
+                /** @description 每页数量 */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["V2NoteListResult"];
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+            429: components["responses"]["429"];
+            500: components["responses"]["500"];
+        };
+    };
+    note_api_v2_note_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Markdown 正文 */
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description 是否创建成功 */
+                        success: boolean;
+                        data: components["schemas"]["V2NoteCreateResult"];
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+            429: components["responses"]["429"];
+            500: components["responses"]["500"];
+        };
+    };
+    note_api_v2_note_show: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 小记 ID */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["V2Note"];
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+            429: components["responses"]["429"];
+            500: components["responses"]["500"];
+        };
+    };
+    note_api_v2_note_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description 小记 ID */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Markdown 源文本 */
+                    source: string;
+                    /** @description HTML 内容 */
+                    html: string;
+                    /** @description 内容摘要 */
+                    abstract: string;
+                    /** @description 小记状态 */
+                    status?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            data: components["schemas"]["V2Note"];
+                        };
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+            429: components["responses"]["429"];
+            500: components["responses"]["500"];
+        };
+    };
+    resource_api_v2_board_show: {
+        parameters: {
+            query: {
+                /** @description 资源类型，目前只支持 board */
+                resource_type: "board";
+                /** @description 原始画板资源 ID */
+                src: string;
+                /** @description 文档 ID，与 url 二选一 */
+                doc_id?: number;
+                /** @description 文档 URL，与 doc_id 二选一 */
+                url?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["V2ResourceResult"];
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+            429: components["responses"]["429"];
+            500: components["responses"]["500"];
+        };
+    };
+    resource_api_v2_board_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description 原始画板资源 ID */
+                    src: string;
+                    /** @description 文档 ID，与 url 二选一 */
+                    doc_id?: number;
+                    /** @description 文档 URL，与 doc_id 二选一 */
+                    url?: string;
+                    /** @description 新的画板文本 DSL */
+                    text?: string;
+                    /** @description 画板 JSON DSL */
+                    dsl?: {
+                        [key: string]: unknown;
+                    };
+                } & ((unknown | unknown) & (unknown | unknown));
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["V2ResourceResult"];
+                    };
+                };
+            };
+            400: components["responses"]["400"];
+            401: components["responses"]["401"];
+            403: components["responses"]["403"];
+            404: components["responses"]["404"];
+            422: components["responses"]["422"];
+            429: components["responses"]["429"];
+            500: components["responses"]["500"];
+        };
+    };
+    resource_api_v2_board_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description 画板类型
+                     * @enum {string}
+                     */
+                    type: "mindmap" | "flowchart" | "architecturediagram";
+                    /** @description 画板文本 DSL */
+                    dsl: string;
+                    /** @description 文档 ID，与 url 二选一 */
+                    doc_id?: number;
+                    /** @description 文档 URL，与 doc_id 二选一 */
+                    url?: string;
+                    /** @description 插入到指定顶层 Lake 节点之后 */
+                    insert_after_lake_id?: string;
+                } & (unknown | unknown);
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: components["schemas"]["V2ResourceResult"];
                     };
                 };
             };

@@ -31,6 +31,8 @@ bin.ts → cli.ts (commander program, error → exit code)
 - `src/commands/book.ts` — `registerBookCommands` registers book list/get/create/update/delete, pagination, validation, and delete confirmation.
 - `src/commands/doc.ts` — `registerDocCommands` registers document CRUD, body/file handling, pagination, and version reads.
 - `src/commands/group.ts` — `registerGroupCommands` registers group-member list/set/remove, pagination, roles, and removal confirmation.
+- `src/commands/note.ts` — `registerNoteCommands` registers note list/get/create/update, `has_more` pagination, file-backed content, and note rendering.
+- `src/commands/resource.ts` — `registerResourceCommands` registers structured-board get/create/update, locator validation, and text/JSON DSL handling.
 - `src/commands/search.ts` — `registerSearchCommands` registers typed doc/book search and maps the book surface name to the API's `repo` value.
 - `src/commands/stats.ts` — `registerStatsCommands` registers aggregate/member/book/doc statistics, filters, sorting, and page draining.
 - `src/commands/toc.ts` — `registerTocCommands` registers TOC tree reads and cross-field-validated node updates.
@@ -40,12 +42,14 @@ bin.ts → cli.ts (commander program, error → exit code)
 - `src/client/api/book.ts` — book owner collection and id-or-namespace item API wrappers.
 - `src/client/api/doc.ts` — document CRUD, global-id lookup, and published-version API wrappers.
 - `src/client/api/group.ts` — group-member list/update/remove API wrappers.
+- `src/client/api/note.ts` — note CRUD-without-delete wrappers, including the create and double-wrapped update response quirks.
+- `src/client/api/resource.ts` — structured-board read/create/update wrappers using the public wire field names.
 - `src/client/api/search.ts` — doc/repo search API wrapper.
 - `src/client/api/stats.ts` — group aggregate and paged member/book/doc statistics API wrappers, including the live-array correction to the spec types.
 - `src/client/api/toc.ts` — book TOC read/update API wrappers and update-body shape.
 - `src/client/api/user.ts` — heartbeat, current-user, and user-groups API wrappers.
 - `src/client/book-ref.ts` — parses a book reference as a numeric id or `group/slug` and produces the encoded `/repos/...` base path.
-- `src/client/paginate.ts` — drains offset-paged endpoints for `--all` until the first short page.
+- `src/client/paginate.ts` — drains offset-paged or explicit `has_more` endpoints for `--all`.
 - `src/client/types.gen.ts` — generated from `spec/yuque-openapi.yaml`; edit the spec and run `npm run gen:types`, never edit this file directly.
 - `src/client/types.ts` — thin compatibility adapter over the generated schemas; preserves public type names, live-API extensions, and index signatures for `--json` pass-through.
 - `spec/yuque-openapi.yaml` — vendored upstream OpenAPI contract and source of truth for the supported operation surface.
